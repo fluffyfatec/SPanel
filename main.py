@@ -5,6 +5,12 @@ from tabulate import tabulate
 import schedule
 import time
 
+# Cuidando do CSV, puxando o dado bruto e retirando as colunas que não tem serventia e jogando no df_tratado
+df_state = pd.read_csv('df_state.csv',sep=";")
+df_state = df_state.drop(
+    columns=['dia', 'mes', 'casos_pc', 'casos_mm7d', 'obitos_pc', 'obitos_mm7d', 'letalidade', 'nome_ra'
+         , 'cod_ra', 'nome_drs', 'cod_drs', "pop_60", 'area', 'map_leg', 'map_leg_s', 'latitude', 'longitude','semana_epidem'])
+df_state.to_csv("df_tratado.csv")
 
 # VARIAVEIS EXT
 loop=True
