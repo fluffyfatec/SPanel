@@ -11,6 +11,7 @@ df_state = df_state.drop(
          , 'cod_ra', 'nome_drs', 'cod_drs', "pop_60", 'area', 'map_leg', 'map_leg_s', 'latitude', 'longitude','semana_epidem'])
 df_state['nome_munic'] = df_state['nome_munic'].str.upper()
 
+
 # VACINAS.CSV
 df=pd.read_csv("vacinas.csv",sep=';')
 df_unica = df[df['Dose'] =='UNICA']
