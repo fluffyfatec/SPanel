@@ -21,7 +21,9 @@ while loop==True:
 
 
     # CASO ESCOLHA SÃO PAULO FILTRAR E TABELAR
-    if indice_municipio != '1' and '2' and '3' and '4'and '5' and '6' and '7' and '8' and '9' and '10' and '11':
+    if indice_municipio != '1' and indice_municipio !='2' and indice_municipio !='3' and indice_municipio !='4'\
+            and indice_municipio !='5' and indice_municipio !='6' and indice_municipio !='7' \
+            and indice_municipio !='8' and indice_municipio !='9' and indice_municipio !='10' and indice_municipio !='11':
         print('\033[1;31m' + 'ERRO! Não foi digitado um número correto =(' + '\033[0;0m')
         continue
     else:
