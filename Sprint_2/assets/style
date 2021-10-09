@@ -1,0 +1,256 @@
+@import url('https://fonts.googleapis.com/css?family=Open+Sans&display=swap');
+
+/* Corpo da página ---------------------------------------------*/
+body {
+  background-color: #f1f1f1;
+  color: #f1f1f1;
+  margin: 0;
+  padding: 0;
+  font-color: white;
+}
+
+.faqtitulo
+{
+    color: #1f1b18;
+    font-color: white;
+    font-size:14px;
+    font-weight: bold;
+    font-family: Gill Sans, sans-serif;
+}
+P
+{
+    color: #3B332D;
+    font-color: white;
+    font-size:13px;
+    font-weight: bold;
+    font-family: Gill Sans, sans-serif;
+}
+.cardmodal
+{
+    background-color: #f1f1f1
+}
+.bt_modalFaq
+{
+  backgroung-color: #db261f;
+  color: white;
+  font-size:12px;
+  border: none;
+  float: right
+}
+.bt_close_modal
+{
+  background-color: #db261f;
+  color: white;
+  font-size:12px;
+  border: none;
+}
+/* Fonte dos Cards ---------------------------------------------*/
+H1{
+font-weight: bold;
+font-family: Gill Sans, sans-serif;
+margin-top: -10px;
+}
+
+H2{
+font-weight: bold;
+font-family: Gill Sans, sans-serif;
+margin-top: -10px;
+margin-bottom: -5px;
+}
+
+H5{
+font-weight: bold;
+font-family: Gill Sans, sans-serif;
+}
+H6{
+font-family: Gill Sans, sans-serif;
+}
+
+/* Cards ---------------------------------------------*/
+.cards{
+border-style: none;
+margin-top : 10px;
+box-shadow: 0.1em 0.1em 0.5em black;
+}
+
+/* Blockquotes –––––––––––––––––––––––––––––––––––––––––––––––––– */
+blockquote {
+  border-left: 4px lightgrey solid;
+  padding-left: 1rem;
+  margin-top: 2rem;
+  margin-bottom: 2rem;
+  margin-left: 0rem;
+}
+
+/* Buttons –––––––––––––––––––––––––––––––––––––––––––––––––– */
+.button, button, input[type="submit"], input[type="reset"], input[type="button"] {
+  text-align: center;
+  padding: 0px 7.5px;
+  background-color: white;
+  border-radius: 100%;
+  border-style: none;
+  cursor: pointer;
+}
+.buttonred{
+  text-align: center;
+  padding: 0px 7.5px;
+  background-color: #db261f;
+  border-radius: 100%;
+  border-style: none;
+  cursor: pointer;
+}
+.bt-sobre{
+  backgroung-color: #db261f;
+  color: white;
+  font-size:12px;
+  border: none;
+  float: right
+}
+.bt-link{
+  color:#db261f;
+  font-size:12px;
+  border: none;
+}
+.btn-link:hover {
+ color:#db261f;
+ text-decoration: none;
+}
+.btn-link:focus,
+.btn-link.focus {
+ text-decoration:none
+ }
+
+/* Forms –––––––––––––––––––––––––––––––––––––––––––––––––– */
+input[type="email"], input[type="number"], input[type="search"], input[type="text"], input[type="tel"], input[type="url"], input[type="password"], textarea, select {
+  height: 36.5px;
+  padding: 6px 10px;
+ /* The 6px vertically centers text on FF, ignored by Webkit */
+  background-color: #1f1b18;
+  border: 1px solid #D1D1D1;
+  border-radius: 3px;
+  box-shadow: none;
+  box-sizing: border-box;
+  font-family: inherit;
+  font-size: inherit;
+  color: #f1f1f1;
+ /*https://stackoverflow.com/questions/6080413/why-doesnt-input-inherit-the-font-from-body*/
+}
+
+/* Dropdown Cidades ---------------------------------------------*/
+.Select-control, .Select-menu-outer, .Select-multi-value-wrapper, .select-up, .is-open .Select-control {
+  background-color: #1f1b18;
+  color: #f1f1f1;
+}
+
+.Select-control{
+  border: 1.5px solid #f1f1f1;
+  height: 35px;
+}
+
+.VirtualizedSelectFocusedOption {
+    background-color: #db261f;
+}
+
+.has-value.Select--single>.Select-control .Select-value .Select-value-label, .has-value.is-pseudo-focused.Select--single>.Select-control .Select-value .Select-value-label {
+  color: #f1f1f1;
+  height: 36.5px;
+  width:50px;
+}
+
+.Select-control, .Select-input > input {
+	width: 100%;
+	cursor: default;
+	outline: 0;
+	color: white;
+}
+
+/* Teste de responsividade ---------------------------------------------*/
+@media (min-width: 400px) {
+}
+/* Larger than phablet (also point when grid becomes active) */
+@media (min-width: 550px) {
+}
+/* Larger than tablet */
+@media (min-width: 750px) {
+}
+/* Larger than desktop */
+@media (min-width: 1000px) {
+}
+/* Larger than Desktop HD */
+@media (min-width: 1200px) {
+}
+
+/* Date Range ---------------------------------------------*/
+#date-range {
+  background-color: #1f1b18;
+  font-family: Gill Sans, sans-serif;
+  font-weight: 200;
+  color: #f1f1f1;
+  border: 1.5px solid #f1f1f1;
+  border-radius:6px;
+}
+
+._dash-undo-redo {
+  display: none;
+}
+
+.DateRangeInput.DateRangeInput_1{
+  width: 110%
+}
+
+.DateRangePickerInput__withBorder{
+  border:none;
+}
+
+.DateInput.DateInput_1 {
+  background-color: #1f1b18;
+}
+
+.DateRangePickerInput__withBorder {
+  border-radius: 3px;
+  color: #f1f1f1;
+  background: #1f1b18;
+  background-color: #1f1b18;
+}
+
+.DateRangePickerInput_arrow_svg{
+  width: 20px;
+  height: 16px;
+  fill: white;
+}
+
+.DateInput_fangStroke
+{
+   fill: #161616;
+   stroke: #161616;
+}
+
+.CalendarDay__selected_span
+{
+   background-color: #08f4f4
+}
+
+.CalendarMonth_caption
+{
+    color:#000;
+    font-family: Gill Sans, sans-serif;
+}
+
+.DayPickerNavigation_svg__horizontal
+{
+    fill:#000;
+}
+
+.DateRangePickerInput.DateRangePickerInput_1.DateRangePickerInput__withBorder.DateRangePickerInput__withBorder_2 {
+  border: 0.0px solid #f1f1f1;
+  display: block;
+}
+.DateRangePicker_1 {
+  border: 0.0px solid #f1f1f1;
+  display: block;
+}
+
+.DateRangePicker_picker, .DateRangePicker_picker_1, .DateRangePicker_picker__directionLeft,
+.DateRangePicker_picker__directionLeft_2{
+  filter:invert(98%) contrast(90%) opacity(98%);
+}
