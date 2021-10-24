@@ -529,7 +529,7 @@ def display_status(location, start_date,end_date):
 def plot_line_graph(location):
     if not location:
         df_data_on_location = df_tratado.assign(casos=df_tratado['casos'].sum())
-        df_data_on_location = df_tratado.assign(casos_novos=df_tratado['casos_novos'].sum())# SOMAR PARA TRAZER ESTADO DE SP
+        df_data_on_location = df_data_on_location.assign(casos_novos=df_data_on_location['casos_novos'].sum())# SOMAR PARA TRAZER ESTADO DE SP
     else:
         df_data_on_location = df_tratado[df_tratado["nome_munic"] == location]
 
