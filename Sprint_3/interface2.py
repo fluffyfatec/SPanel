@@ -7,6 +7,9 @@ import dash_core_components as dcc
 import dash_html_components as html
 from dash.dependencies import Input, Output, State
 import dash_bootstrap_components as dbc
+import plotly.express as px
+import plotly.graph_objects as go
+import datetime
 
 # ==================================================================
 # Bibliotecas de manipulação de dados
@@ -17,6 +20,19 @@ import pandas as pd
 df_tratado = pd.read_csv("docs/df_tratado.csv")
 #df_tratado['datahora'] = pd.to_datetime(df_tratado['datahora'],format='%d/%m/%Y') #formatação de datahotra
 list_municipios = sorted(df_tratado['nome_munic'].unique()) #formatação de municipios
+# ==================================================================
+# Graficos
+fig1 = go.Figure()
+fig1.add_trace(go.Scatter(x=df_tratado["datahora"], y=df_tratado["casos"]))
+fig1.update_layout(
+    autosize=True,
+    margin = dict(l=50, r=50, t=50, b=50),
+)
+fig2 = go.Figure()
+fig2.add_trace(go.Bar(x=df_tratado["datahora"], y=df_tratado["casos_novos"]))
+fig2.update_layout(
+    autosize=True,
+    margin = dict(l=50, r=50, t=50, b=50))
 
 # ==================================================================
 # Layout
@@ -36,7 +52,7 @@ app.layout = dbc.Container([
         , dbc.Col([
             dbc.Row([
                 dbc.Col([
-                    dbc.Button("Dicas", id="open-modalFaq", className="bt_modalFaq", n_clicks=0, color="link",
+                    dbc.Button("Dicas", id="open-modalFaq", className="bt-sobre", n_clicks=0, color="link",
                                style={"margin-bottom": "-10px"}),
                     dbc.Modal([
                         dbc.ModalHeader("DICAS", style={"color": "#1f1b18", "font-weight": "bold","background-color":"#f1f1f1"}),
@@ -54,8 +70,8 @@ app.layout = dbc.Container([
                                         )
                                     ),
                                 dbc.Collapse(
-                                    dbc.CardBody(html.Div([html.P("A COVID-19 é uma doença causada pelo coronavírus, nomeado SARS-CoV-2, que apresenta um sinal clínico variando de infecções, com quadros graves e assintomáticos."),
-                                                          html.P("De acordo com a OMS (organização mundial de saúde), a maioria dos pacientes com COVID-19 podem ser assintomáticos ou apresentar poucos sintomas, em média 20% dos casos detectados necessitam de atendimento hospitalar, por causar dificuldade respiratória, dos quais 5% podem necessitar de suporte de ventilação mecânica.")
+                                    dbc.CardBody(html.Div([html.B("A COVID-19 é uma doença causada pelo coronavírus, nomeado SARS-CoV-2, que apresenta um sinal clínico variando de infecções, com quadros graves e assintomáticos."),
+                                                          html.B("De acordo com a OMS (organização mundial de saúde), a maioria dos pacientes com COVID-19 podem ser assintomáticos ou apresentar poucos sintomas, em média 20% dos casos detectados necessitam de atendimento hospitalar, por causar dificuldade respiratória, dos quais 5% podem necessitar de suporte de ventilação mecânica.")
                                                           ])),
                                     id="collapse-1",
                                     is_open=False,
@@ -75,10 +91,10 @@ app.layout = dbc.Container([
                                         )
                                     ),
                                     dbc.Collapse(
-                                        dbc.CardBody(html.Div([html.P("• A transmissão é feita por contato: ou seja, por meio do contato direto com uma pessoa infectada – exemplo: com um aperto de mão seguido do toque nos olhos, nariz ou boca, ou com objetos e superfícies contaminadas;"),
-                                                          html.P("• A transmissão por gotículas: por meio da exposição a gotículas respiratórias expelidas, contendo vírus, por uma pessoa infectada quando ela tosse ou espirra, principalmente quando ela se encontra a menos de 1 metro de distância da outra;")
-                                                          ,html.P("• A transmissão por aerossol: por meio de gotículas respiratórias menores (aerossóis) contendo vírus e que podem permanecer suspensas no ar, serem levadas por distâncias maiores que 1 metro e por períodos mais longos - geralmente horas.")
-                                                          ,html.P("A maioria das infecções se espalha por contato próximo - menos de 1 metro -, principalmente por meio de gotículas respiratórias.")
+                                        dbc.CardBody(html.Div([html.B("• A transmissão é feita por contato: ou seja, por meio do contato direto com uma pessoa infectada – exemplo: com um aperto de mão seguido do toque nos olhos, nariz ou boca, ou com objetos e superfícies contaminadas;"),
+                                                          html.B("• A transmissão por gotículas: por meio da exposição a gotículas respiratórias expelidas, contendo vírus, por uma pessoa infectada quando ela tosse ou espirra, principalmente quando ela se encontra a menos de 1 metro de distância da outra;")
+                                                          ,html.B("• A transmissão por aerossol: por meio de gotículas respiratórias menores (aerossóis) contendo vírus e que podem permanecer suspensas no ar, serem levadas por distâncias maiores que 1 metro e por períodos mais longos - geralmente horas.")
+                                                          ,html.B("A maioria das infecções se espalha por contato próximo - menos de 1 metro -, principalmente por meio de gotículas respiratórias.")
                                                           ])),
                                         id="collapse-2",
                                         is_open=False,
@@ -98,12 +114,12 @@ app.layout = dbc.Container([
                                         )
                                     ),
                                 dbc.Collapse(
-                                    dbc.CardBody(html.Div([html.P("• Caso assintomático: mesmo com o teste laboratorial positivo para covid-19 não apresentam sintomas."),
-                                                          html.P("• Caso leve: indicado pela aparição de sintomas não específicos, como tosse, dor de garganta ou coriza, seguido, ou não, de perda de olfato e paladar, diarreia, dor abdominal, febre, calafrios, mialgia, fadiga e/ou cefaleia;")
-                                                          ,html.P("• Caso moderado: os sintomas mais presentes podem apresentar sinais leves, como tosse persistente e febre persistente diária, até sinais de piora progressiva de outro sintoma relacionado à covid-19 (fraqueza, debilidade física, falta de apetite, diarreia), além da presença de pneumonia sem sinais ou sintomas de gravidade.")
-                                                          ,html.P("• Caso grave: ou a Síndrome Respiratória Aguda Grave (Síndrome Gripal que apresente dificuldade para respirar, desconforto respiratório ou pressão persistente no peito ou saturação de oxigênio menor que 95% em ar ambiente ou coloração azulada de lábios ou rosto.")
-                                                          ,html.P("• Caso crítico: os principais sintomas são infecção, síndrome do desconforto respiratório agudo, deficiência respiratória grave, mal funcionamento de múltiplos órgãos, pneumonia grave, necessidade de suporte respiratório mecânico e internações em UTI (unidades de terapia intensiva).")
-                                                          ,html.P("• As crianças apresentam como os principais sintomas como: aceleração do ritmo respiratório, baixa saturação de oxigenação no sangue, desconforto respiratório, alteração da consciência, desidratação, dificuldade para se alimentar, coloração azulada, letargia, convulsões, recusa alimentar.")
+                                    dbc.CardBody(html.Div([html.B("• Caso assintomático: mesmo com o teste laboratorial positivo para covid-19 não apresentam sintomas."),
+                                                          html.B("• Caso leve: indicado pela aparição de sintomas não específicos, como tosse, dor de garganta ou coriza, seguido, ou não, de perda de olfato e paladar, diarreia, dor abdominal, febre, calafrios, mialgia, fadiga e/ou cefaleia;")
+                                                          ,html.B("• Caso moderado: os sintomas mais presentes podem apresentar sinais leves, como tosse persistente e febre persistente diária, até sinais de piora progressiva de outro sintoma relacionado à covid-19 (fraqueza, debilidade física, falta de apetite, diarreia), além da presença de pneumonia sem sinais ou sintomas de gravidade.")
+                                                          ,html.B("• Caso grave: ou a Síndrome Respiratória Aguda Grave (Síndrome Gripal que apresente dificuldade para respirar, desconforto respiratório ou pressão persistente no peito ou saturação de oxigênio menor que 95% em ar ambiente ou coloração azulada de lábios ou rosto.")
+                                                          ,html.B("• Caso crítico: os principais sintomas são infecção, síndrome do desconforto respiratório agudo, deficiência respiratória grave, mal funcionamento de múltiplos órgãos, pneumonia grave, necessidade de suporte respiratório mecânico e internações em UTI (unidades de terapia intensiva).")
+                                                          ,html.B("• As crianças apresentam como os principais sintomas como: aceleração do ritmo respiratório, baixa saturação de oxigenação no sangue, desconforto respiratório, alteração da consciência, desidratação, dificuldade para se alimentar, coloração azulada, letargia, convulsões, recusa alimentar.")
                                                           ])),
                                     id="collapse-3",
                                     is_open=False,
@@ -123,8 +139,8 @@ app.layout = dbc.Container([
                                         )
                                     ),
                                 dbc.Collapse(
-                                    dbc.CardBody(html.Div([html.P("As medidas indicadas, estão as não farmacológicas (conjunto de intervenções que visam maximizar o funcionamento cognitivo e o bem-estar da pessoa, bem como ajudá-la no processo de adaptação à doença), como distanciamento social, etiqueta respiratória e de higienização das mãos, uso de máscaras, limpeza e desinfeção de ambientes, isolamento de casos suspeitos e confirmados e quarentena dos contatos dos casos de covid-19, conforme orientações médicas."),
-                                                          html.P("Também é recomendada a vacinação contra a covid-19 dos grupos prioritários conforme o Plano Nacional de Operacionalização da Vacinação.")
+                                    dbc.CardBody(html.Div([html.B("As medidas indicadas, estão as não farmacológicas (conjunto de intervenções que visam maximizar o funcionamento cognitivo e o bem-estar da pessoa, bem como ajudá-la no processo de adaptação à doença), como distanciamento social, etiqueta respiratória e de higienização das mãos, uso de máscaras, limpeza e desinfeção de ambientes, isolamento de casos suspeitos e confirmados e quarentena dos contatos dos casos de covid-19, conforme orientações médicas."),
+                                                          html.B("Também é recomendada a vacinação contra a covid-19 dos grupos prioritários conforme o Plano Nacional de Operacionalização da Vacinação.")
                                                           ])),
                                     id="collapse-4",
                                     is_open=False,
@@ -153,40 +169,40 @@ app.layout = dbc.Container([
                         dbc.ModalBody([
                             html.Div([
                                 html.H6("Introdução",style={"color":"#1f1b18","font-weight": "bold"}),
-                                html.P("O SPanel foi desenvolvido para a visualização ágil e simplificada dos dados do COVID-19 no Estado de São Paulo e seus respectivos Municípios.",style={"color":"#3B332D"}),
+                                html.B("O SPanel foi desenvolvido para a visualização ágil e simplificada dos dados do COVID-19 no Estado de São Paulo e seus respectivos Municípios.",style={"color":"#3B332D"}),
 
                                 html.H6("Limitações",style={"color":"#1f1b18","font-weight": "bold","padding-top":"10px"}),
-                                html.P("Levando em consideração a pluralidade em relação a infraestrutura ao estado e municípios, "
+                                html.B("Levando em consideração a pluralidade em relação a infraestrutura ao estado e municípios, "
                                         "poderá haver mudanças aos números em decorrência de erros ou atrasos ao repasse de informações.",style={"color":"#3B332D"}),
 
                                 html.H5("Conceitos básicos:",style={"color":"#1f1b18","font-weight": "bold","padding-top":"10px"}),
                                 html.H6("Imunizados",style={"color":"#1f1b18","font-weight": "bold"}),
-                                html.P("O número de imunizados, é feito pela soma da população que já efetuou a vacinação da dose "
+                                html.B("O número de imunizados, é feito pela soma da população que já efetuou a vacinação da dose "
                                         "única e da segunda dose das vacinas disponibilizadas pelo Governo do Estado de São Paulo.",style={"color":"#3B332D"}),
 
                                 html.H6("Casos Acumulados",style={"color":"#1f1b18","font-weight": "bold","padding-top":"10px"}),
-                                html.P("O número total de casos confirmados por COVID-19, foi disponibilizado pelo Estado de São Paulo em relação ao dia anterior.",style={"color":"#3B332D"}),
+                                html.B("O número total de casos confirmados por COVID-19, foi disponibilizado pelo Estado de São Paulo em relação ao dia anterior.",style={"color":"#3B332D"}),
 
                                 html.H6("Novos casos no período",style={"color":"#1f1b18","font-weight": "bold","padding-top":"10px"}),
-                                html.P("O número de novos casos no período por COVID-19, foi disponibilizado pelo Estado de São Paulo em relação ao dia anterior realizando a soma dos dias definidos pelo usuario.",style={"color":"#3B332D"}),
+                                html.B("O número de novos casos no período por COVID-19, foi disponibilizado pelo Estado de São Paulo em relação ao dia anterior realizando a soma dos dias definidos pelo usuario.",style={"color":"#3B332D"}),
 
                                 html.H6("Óbitos Acumulados", style={"color": "#1f1b18", "font-weight": "bold","padding-top":"10px"}),
-                                html.P("O número de óbitos acumulados por COVID-19, foi disponibilizado pelo Estado de São Paulo em relação ao dia anterior.",style={"color":"#3B332D"}),
+                                html.B("O número de óbitos acumulados por COVID-19, foi disponibilizado pelo Estado de São Paulo em relação ao dia anterior.",style={"color":"#3B332D"}),
 
                                 html.H6("Novos óbitos no período", style={"color": "#1f1b18", "font-weight": "bold","padding-top":"10px"}),
-                                html.P("O número de novos óbitos no período por COVID-19, foi disponibilizado pelo Estado de São Paulo em relação ao dia anterior realizando a soma dos dias definidos pelo usuario",style={"color": "#3B332D"}),
+                                html.B("O número de novos óbitos no período por COVID-19, foi disponibilizado pelo Estado de São Paulo em relação ao dia anterior realizando a soma dos dias definidos pelo usuario",style={"color": "#3B332D"}),
 
                                 html.H6("População", style={"color": "#1f1b18", "font-weight": "bold","padding-top":"10px"}),
-                                html.P("O número da população, foi disponibilizado pelo Estado de São Paulo e pode conter uma divergência com a realiadade.",
+                                html.B("O número da população, foi disponibilizado pelo Estado de São Paulo e pode conter uma divergência com a realiadade.",
                                     style={"color": "#3B332D"}),
 
                                 html.H5("Indicadores básicos:", style={"color": "#1f1b18", "font-weight": "bold","padding-top":"10px"}),
                                 html.H6("Porcentagem Imunizados", style={"color": "#1f1b18", "font-weight": "bold"}),
-                                html.P("A porcentagem de imunizados é dada pelo total de população do estado de São Paulo e seus respectivos municípios, e pelo total de imunizados até o presente momento.",
+                                html.B("A porcentagem de imunizados é dada pelo total de população do estado de São Paulo e seus respectivos municípios, e pelo total de imunizados até o presente momento.",
                                     style={"color": "#3B332D"}),
 
                                 html.H6("Taxa de Letalidade", style={"color": "#1f1b18", "font-weight": "bold","padding-top":"10px"}),
-                                html.P("A taxa de letalidade por COVID-19, é feita pelo número de óbitos confirmados em relação, ao total de casos confirmados pelos cidadãos residentes no Estado de São Paulo e seus respectivos Municípios.",
+                                html.B("A taxa de letalidade por COVID-19, é feita pelo número de óbitos confirmados em relação, ao total de casos confirmados pelos cidadãos residentes no Estado de São Paulo e seus respectivos Municípios.",
                                     style={"color": "#3B332D"}),
 
                                 html.H5("Fonte", style={"color": "#1f1b18", "font-weight": "bold","padding-top":"10px"}),
@@ -279,7 +295,7 @@ app.layout = dbc.Container([
                             html.H6("% Imunizados", style={"color": "#f1f1f1", "font-weight": "bold"}),
                             html.H2(style={"color": "#f1f1f1"},
                             id="porcentagemimunizados-text")
-                        ],md=5)
+                        ],md=5,style={'margin-bottom':'5px'})
                     ])
                 ])
             ], color="#db261f",className='cards',style={"margin-left": "5px"})
@@ -395,6 +411,36 @@ app.layout = dbc.Container([
             ], color="#201b17",className='cards',style={"margin-right": "5px"})
         ], md=3)
     ], style={"border-bottom": "10px solid #f1f1f1", "background-image": "linear-gradient(#1f1b18 50%, #f1f1f1 50%)"})
+    , dbc.Row([
+        dbc.Col([
+            dcc.Markdown(['''>
+        > Imunizados
+        >'''], className="lb_imunizados")
+        ])
+    ])
+    , dbc.Row([
+        dbc.Col([
+            dcc.Graph(id="casos-graph4", figure=fig1) #COLOCA AQUI OS GRAFICOS IMUNIZADOS LUIZ
+        ], md=6)
+        , dbc.Col([
+            dcc.Graph(id="casos-graph3", figure=fig1) #E AQUI TAMBÉM, PODE TIRAR ESSES DOIS
+        ], md=6)
+    ])
+    ,dbc.Row([
+        dbc.Col([
+            dcc.Markdown(['''>
+            > Casos
+            >'''],className="lb_imunizados")
+        ])
+    ])
+    ,dbc.Row([
+        dbc.Col([
+            dcc.Graph(id="casos-graph",figure = fig1)
+        ],md=6)
+        ,dbc.Col([
+            dcc.Graph(id="casosnovos-graph",figure = fig2)
+        ],md=6)
+    ])
 ], fluid=True)
 
 # ==================================================================
@@ -469,6 +515,37 @@ def display_status(location, start_date,end_date):
             novos_ob,
             populacao,
             f'{letalidade}%')
+
+# Chamada graficos
+@app.callback(
+    [
+    Output("casos-graph","figure"),
+    Output("casosnovos-graph","figure")
+    ],
+    [
+    Input("location-dropdown", "value")
+    ]
+)
+def plot_line_graph(location):
+    if not location:
+        df_data_on_location = df_tratado.assign(casos=df_tratado['casos'].sum())
+        df_data_on_location = df_tratado.assign(casos_novos=df_tratado['casos_novos'].sum())# SOMAR PARA TRAZER ESTADO DE SP
+    else:
+        df_data_on_location = df_tratado[df_tratado["nome_munic"] == location]
+
+    fig1.update_traces(go.Scatter(x=df_data_on_location["datahora"], y=df_data_on_location["casos"],name=location))
+    fig1.update_layout(
+        autosize=True,
+        margin=dict(l=50, r=50, t=50, b=50),
+    )
+    fig2.update_traces(go.Bar(x=df_data_on_location["datahora"], y=df_data_on_location["casos_novos"]))
+    fig2.update_layout(
+        autosize=True,
+        margin=dict(l=50, r=50, t=50, b=50))
+    return(
+        fig1,fig2
+    )
+
 
 # Chamada do modal SOBRE
 @app.callback(
