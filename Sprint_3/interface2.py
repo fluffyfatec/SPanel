@@ -1,4 +1,4 @@
-# SPANEL SPRINT 2
+# SPANEL SPRINT 3
 
 # ==================================================================
 # Bibliotecas do layout
@@ -18,18 +18,24 @@ import pandas as pd
 # ==================================================================
 # Pré processamentos
 df_tratado = pd.read_csv("docs/df_tratado.csv")
+df_vacinastratado = pd.read_csv("docs/df_vacinastratado.csv")
 #df_tratado['datahora'] = pd.to_datetime(df_tratado['datahora'],format='%d/%m/%Y') #formatação de datahotra
 list_municipios = sorted(df_tratado['nome_munic'].unique()) #formatação de municipios
+df_graficocasos = df_tratado.drop(
+    columns=['obitos','obitos_novos','pop'])
+
 # ==================================================================
+df_data_on_location = df_graficocasos.assign(casos=df_graficocasos['casos'].sum())
+df_data_on_location = df_data_on_location.assign(casos_novos=df_data_on_location['casos_novos'].sum())# SOMAR PARA TRAZER ESTADO DE SP
 # Graficos
 fig1 = go.Figure()
-fig1.add_trace(go.Scatter(x=df_tratado["datahora"], y=df_tratado["casos"]))
+fig1.add_trace(go.Scatter(x=df_data_on_location["datahora"], y=df_data_on_location["casos"]))
 fig1.update_layout(
     autosize=True,
     margin = dict(l=50, r=50, t=50, b=50),
 )
 fig2 = go.Figure()
-fig2.add_trace(go.Bar(x=df_tratado["datahora"], y=df_tratado["casos_novos"]))
+fig2.add_trace(go.Bar(x=df_data_on_location["datahora"], y=df_data_on_location["casos_novos"]))
 fig2.update_layout(
     autosize=True,
     margin = dict(l=50, r=50, t=50, b=50))
@@ -420,10 +426,10 @@ app.layout = dbc.Container([
     ])
     , dbc.Row([
         dbc.Col([
-            dcc.Graph(id="casos-graph4", figure=fig1) #COLOCA AQUI OS GRAFICOS IMUNIZADOS LUIZ
+            #dcc.Graph(id="casos-graph4", figure=fig1) #COLOCA AQUI OS GRAFICOS IMUNIZADOS LUIZ
         ], md=6)
         , dbc.Col([
-            dcc.Graph(id="casos-graph3", figure=fig1) #E AQUI TAMBÉM, PODE TIRAR ESSES DOIS
+            #dcc.Graph(id="casos-graph3", figure=fig1) #E AQUI TAMBÉM, PODE TIRAR ESSES DOIS
         ], md=6)
     ])
     ,dbc.Row([
@@ -472,31 +478,32 @@ def display_status(location, start_date,end_date):
         df_data_var_date = df_data_var_date.assign(casos_novos=df_data_var_date['casos_novos'].sum())  # SOMAR PARA TRAZER ESTADO DE SP
         df_data_on_date = df_data_on_date.assign(casos=df_data_on_date['casos'].sum())  # SOMAR PARA TRAZER ESTADO DE SP
         df_data_on_date = df_data_on_date.assign(pop=df_data_on_date['pop'].sum())  # SOMAR PARA TRAZER ESTADO DE SP
-        df_data_on_date = df_data_on_date.assign(doseunica=df_data_on_date["doseunica"].sum())
-        df_data_on_date = df_data_on_date.assign(segundadose=df_data_on_date["segundadose"].sum())
-        df_data_on_date = df_data_on_date.assign(Imunizados=df_data_on_date['doseunica'] + df_data_on_date['segundadose'])  # SOMAR PARA TRAZER ESTADO DE SP
-        df_data_on_date = df_data_on_date.assign(porcentagemimunizados=df_data_on_date['Imunizados'] / df_data_on_date['pop'] * 100)
+        df_data_vacinastratado = df_vacinastratado.assign(doseunica=df_vacinastratado["doseunica"].sum())
+        df_data_vacinastratado = df_data_vacinastratado.assign(segundadose=df_data_vacinastratado["segundadose"].sum())
+        df_data_vacinastratado = df_data_vacinastratado.assign(Imunizados=df_data_vacinastratado['doseunica'] + df_data_vacinastratado['segundadose'])  # SOMAR PARA TRAZER ESTADO DE SP
+        df_data_on_date = df_data_on_date.assign(porcentagemimunizados=df_data_vacinastratado['Imunizados'] / df_data_on_date['pop'] * 100)
         decimals = 2
         df_data_on_date['porcentagemimunizados'] = df_data_on_date['porcentagemimunizados'].apply(lambda x: round(x, decimals))
-        df_data_on_date = df_data_on_date.assign(primeiradose=df_data_on_date["primeiradose"].sum())
+        df_data_vacinastratado = df_data_vacinastratado.assign(primeiradose=df_data_vacinastratado["primeiradose"].sum())
         df_data_on_date = df_data_on_date.assign(letalidade=df_data_on_date['obitos'] / df_data_on_date['casos'] * 100)
         df_data_on_date['letalidade'] = df_data_on_date['letalidade'].apply(lambda x: round(x, decimals))
     else:
         df_data_var_date = df_tratado[(df_tratado["nome_munic"] == location)]
+        df_data_vacinastratado = df_vacinastratado[(df_vacinastratado["nome_munic"] == location)]
         df_data_var_date = df_data_var_date[(df_data_var_date['datahora'] >= start_date) & (df_data_var_date['datahora'] <= end_date)]
         df_data_on_date = df_data_var_date[(df_data_var_date["datahora"] == end_date)]
         df_data_var_date = df_data_var_date.assign(obitos_novos=df_data_var_date['obitos_novos'].sum())
         df_data_var_date = df_data_var_date.assign(casos_novos=df_data_var_date['casos_novos'].sum())
-        df_data_on_date = df_data_on_date.assign(Imunizados=df_data_on_date['doseunica'] + df_data_on_date['segundadose'])
-        df_data_on_date = df_data_on_date.assign(porcentagemimunizados=df_data_on_date['Imunizados'] / df_data_on_date['pop'] * 100)
+        df_data_vacinastratado = df_data_vacinastratado.assign(Imunizados=df_data_vacinastratado['doseunica'] + df_data_vacinastratado['segundadose'])
+        df_data_on_date = df_data_on_date.assign(porcentagemimunizados=df_data_vacinastratado['Imunizados'] / df_data_on_date['pop'] * 100)
         decimals = 2
         df_data_on_date['porcentagemimunizados'] = df_data_on_date['porcentagemimunizados'].apply(lambda x: round(x, decimals))
         df_data_on_date = df_data_on_date.assign(letalidade=df_data_on_date['obitos'] / df_data_on_date['casos'] * 100)
         df_data_on_date['letalidade'] = df_data_on_date['letalidade'].apply(lambda x: round(x, decimals))
 
 # Filtrando caso os dados sejam vazios e trocando ',' por '.'
-    imunizados = "-" if df_data_on_date["Imunizados"].isna().values[0] else f'{int(df_data_on_date["Imunizados"].values[0]):,}'.replace(",", ".")
-    primeiradose = "-" if df_data_on_date["primeiradose"].isna().values[0] else f'{int(df_data_on_date["primeiradose"].values[0]):,}'.replace(",", ".")
+    imunizados = "-" if df_data_vacinastratado["Imunizados"].isna().values[0] else f'{int(df_data_vacinastratado["Imunizados"].values[0]):,}'.replace(",", ".")
+    primeiradose = "-" if df_data_vacinastratado["primeiradose"].isna().values[0] else f'{int(df_data_vacinastratado["primeiradose"].values[0]):,}'.replace(",", ".")
     porcentagemimunizados = "-" if df_data_on_date["porcentagemimunizados"].isna().values[0] else f'{float(df_data_on_date["porcentagemimunizados"].values[0]):,}'.replace(",", ".")
     acumulados_novos = "-" if df_data_on_date["casos"].isna().values[0] else  f'{int(df_data_on_date["casos"].values[0]):,}'.replace(",", ".")
     novos_caso = "-" if df_data_var_date["casos_novos"].isna().values[0] else f'{int(df_data_var_date["casos_novos"].values[0]):,}'.replace(",", ".")
@@ -528,16 +535,17 @@ def display_status(location, start_date,end_date):
 )
 def plot_line_graph(location):
     if not location:
-        df_data_on_location = df_tratado.assign(casos=df_tratado['casos'].sum())
+        df_data_on_location = df_graficocasos.assign(casos=df_graficocasos['casos'].sum())
         df_data_on_location = df_data_on_location.assign(casos_novos=df_data_on_location['casos_novos'].sum())# SOMAR PARA TRAZER ESTADO DE SP
     else:
-        df_data_on_location = df_tratado[df_tratado["nome_munic"] == location]
+        df_data_on_location = df_graficocasos[df_graficocasos["nome_munic"] == location]
 
     fig1.update_traces(go.Scatter(x=df_data_on_location["datahora"], y=df_data_on_location["casos"],name=location))
     fig1.update_layout(
         autosize=True,
         margin=dict(l=50, r=50, t=50, b=50),
     )
+
     fig2.update_traces(go.Bar(x=df_data_on_location["datahora"], y=df_data_on_location["casos_novos"]))
     fig2.update_layout(
         autosize=True,

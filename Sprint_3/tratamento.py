@@ -1,11 +1,4 @@
 import pandas as pd
-import requests
-
-
-# url = 'https://www.saopaulo.sp.gov.br/planosp/simi/dados-abertos/'
-# r = requests.get(url, allow_redirects=True)
-#
-# open('df_state.csv', 'wb').write(r.content)
 
 # ==================================================================
 # Tratamento dos dados
@@ -13,9 +6,8 @@ import requests
 df_state = pd.read_csv('docs/df_state.csv', sep=";")
 df_state = df_state.drop(
     columns=['dia', 'mes', 'casos_pc', 'casos_mm7d', 'obitos_pc', 'obitos_mm7d', 'letalidade', 'nome_ra'
-         , 'cod_ra', 'nome_drs', 'cod_drs', "pop_60", 'area', 'map_leg', 'map_leg_s', 'latitude', 'longitude','semana_epidem'])
+         , 'cod_ra', 'nome_drs', 'cod_drs', "pop_60", 'area', 'map_leg', 'map_leg_s', 'latitude', 'longitude','semana_epidem','codigo_ibge'])
 df_state['nome_munic'] = df_state['nome_munic'].str.upper()
-
 # Tratando vacinas.csv
 df=pd.read_csv("docs/vacinas.csv", sep=';')
 df = df.rename(
@@ -40,12 +32,12 @@ df_segunda = df_segunda.drop(
     columns=['Dose'])
 
 # Junção das doses no df_vacinas
-df_vacinas = pd.merge(df_unica,df_segunda , how='inner', on='nome_munic')
-df_vacinas = pd.merge(df_vacinas,df_primeira , how='inner', on='nome_munic')
-df_vacinas.fillna(('-'), inplace=True)
+df_vacinastratado = pd.merge(df_unica,df_segunda , how='inner', on='nome_munic')
+df_vacinastratado = pd.merge(df_vacinastratado,df_primeira , how='inner', on='nome_munic')
+df_vacinastratado.fillna(('-'), inplace=True)
 
 # Junção das vacinas.csv e df_state.csv no df_tratado.csv
-df_state = pd.merge(df_state, df_vacinas, how='inner', on='nome_munic')
 df_state['datahora'] = pd.to_datetime(df_state['datahora'],format='%d/%m/%Y')
 df_state.sort_values("datahora")
 df_state.to_csv("docs/df_tratado.csv")
+df_vacinastratado.to_csv("docs/df_vacinastratado.csv")
