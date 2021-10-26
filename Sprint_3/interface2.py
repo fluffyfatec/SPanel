@@ -9,7 +9,6 @@ from dash.dependencies import Input, Output, State
 import dash_bootstrap_components as dbc
 import plotly.express as px
 import plotly.graph_objects as go
-import datetime
 
 # ==================================================================
 # Bibliotecas de manipulação de dados
@@ -19,27 +18,36 @@ import pandas as pd
 # Pré processamentos
 df_tratado = pd.read_csv("docs/df_tratado.csv")
 df_vacinastratado = pd.read_csv("docs/df_vacinastratado.csv")
+df_estadotratado = pd.read_csv("docs/df_estadotratado.csv")
 #df_tratado['datahora'] = pd.to_datetime(df_tratado['datahora'],format='%d/%m/%Y') #formatação de datahotra
 list_municipios = sorted(df_tratado['nome_munic'].unique()) #formatação de municipios
-df_graficocasos = df_tratado.drop(
-    columns=['obitos','obitos_novos','pop'])
 
 # ==================================================================
-# df_data_on_location = df_graficocasos.assign(casos=df_graficocasos['casos'].sum())
-# df_data_on_location = df_data_on_location.assign(casos_novos=df_data_on_location['casos_novos'].sum())# SOMAR PARA TRAZER ESTADO DE SP
 # Graficos
-# fig1 = go.Figure()
-# fig1.add_trace(go.Scatter(x=df_data_on_location["datahora"], y=df_data_on_location["casos"]))
-# fig1.update_layout(
-#     autosize=True,
-#     margin = dict(l=50, r=50, t=50, b=50),
-# )
-#
-# fig2 = go.Figure()
-# fig2.add_trace(go.Bar(x=df_data_on_location["datahora"], y=df_data_on_location["casos_novos"]))
-# fig2.update_layout(
-#     autosize=True,
-#     margin = dict(l=50, r=50, t=50, b=50))
+fig1 = go.Figure()
+fig1.add_trace(go.Scatter(x=df_estadotratado["datahora"], y=df_estadotratado["casos"],line=dict(color='#db261f')))
+fig1.update_layout(
+    title='<b>Casos Acumulados por Período\b',
+    font=dict(family='Gill Sans, sans-serif',size=12,color='#1f1b18'),
+    xaxis_title='Data',
+    yaxis_title='Casos Acumulados',
+    plot_bgcolor='white',
+    title_x = 0.5,
+    autosize=True,
+    margin = dict(l=100, r=50, t=80, b=70),
+)
+
+fig2 = go.Figure()
+fig2.add_trace(go.Bar(x=df_estadotratado["datahora"], y=df_estadotratado["casos_novos"],text=df_estadotratado["casos_novos"],marker_color='#db261f'),)
+fig2.update_layout(
+    title='<b>Casos Novos por Período\b',
+    font=dict(family='Gill Sans, sans-serif',size=12,color='#1f1b18'),
+    xaxis_title='Data',
+    yaxis_title='Casos Novos',
+    plot_bgcolor='white',
+    title_x = 0.5,
+    autosize=True,
+    margin = dict(l=90, r=50, t=80, b=70))
 
 # ==================================================================
 # Layout
@@ -436,16 +444,16 @@ app.layout = dbc.Container([
     ,dbc.Row([
         dbc.Col([
             dcc.Markdown(['''>
-            > Casos
+            > Casos Confirmados
             >'''],className="lb_imunizados")
         ])
     ])
     ,dbc.Row([
         dbc.Col([
-            dcc.Graph(id="casos-graph")
+            dcc.Graph(id="casos-graph",className = 'graph1',)
         ],md=6)
         ,dbc.Col([
-            dcc.Graph(id="casosnovos-graph")
+            dcc.Graph(id="casosnovos-graph",className = 'graph2')
         ],md=6)
     ])
 ], fluid=True)
@@ -471,14 +479,13 @@ app.layout = dbc.Container([
 # Chamada dos dados do CSV - Se Dropdown for vazio chama os dados do estado, senão chama os dados do municipio selecionado
 def display_status(location, start_date,end_date):
     if not location:
-        #df_data_var_date = df_tratado.sort_values("datahora").set_index("datahora")[start_date,end_date]
-        df_data_var_date = df_tratado[(df_tratado['datahora'] >= start_date) & (df_tratado['datahora'] <= end_date)]
-        df_data_on_date = df_tratado[(df_tratado["datahora"] == end_date)]
-        df_data_var_date = df_data_var_date.assign(obitos_novos=df_data_var_date['obitos_novos'].sum())# SOMAR PARA TRAZER ESTADO DE SP
-        df_data_on_date = df_data_on_date.assign(obitos=df_data_on_date['obitos'].sum())  # SOMAR PARA TRAZER ESTADO DE SP
-        df_data_var_date = df_data_var_date.assign(casos_novos=df_data_var_date['casos_novos'].sum())  # SOMAR PARA TRAZER ESTADO DE SP
-        df_data_on_date = df_data_on_date.assign(casos=df_data_on_date['casos'].sum())  # SOMAR PARA TRAZER ESTADO DE SP
-        df_data_on_date = df_data_on_date.assign(pop=df_data_on_date['pop'].sum())  # SOMAR PARA TRAZER ESTADO DE SP
+        df_data_var_date = df_estadotratado[(df_estadotratado['datahora'] >= start_date) & (df_estadotratado['datahora'] <= end_date)]
+        df_data_on_date = df_estadotratado[(df_estadotratado["datahora"] == end_date)]
+        # df_data_var_date = df_data_var_date.assign(obitos_novos=df_data_var_date['obitos_novos'].sum())# SOMAR PARA TRAZER ESTADO DE SP
+        # df_data_on_date = df_data_on_date.assign(obitos=df_data_on_date['obitos'].sum())  # SOMAR PARA TRAZER ESTADO DE SP
+        # df_data_var_date = df_data_var_date.assign(casos_novos=df_data_var_date['casos_novos'].sum())  # SOMAR PARA TRAZER ESTADO DE SP
+        # df_data_on_date = df_data_on_date.assign(casos=df_data_on_date['casos'].sum())  # SOMAR PARA TRAZER ESTADO DE SP
+        # df_data_on_date = df_data_on_date.assign(pop=df_data_on_date['pop'].sum())  # SOMAR PARA TRAZER ESTADO DE SP
         df_data_vacinastratado = df_vacinastratado.assign(doseunica=df_vacinastratado["doseunica"].sum())
         df_data_vacinastratado = df_data_vacinastratado.assign(segundadose=df_data_vacinastratado["segundadose"].sum())
         df_data_vacinastratado = df_data_vacinastratado.assign(Imunizados=df_data_vacinastratado['doseunica'] + df_data_vacinastratado['segundadose'])  # SOMAR PARA TRAZER ESTADO DE SP
@@ -531,33 +538,27 @@ def display_status(location, start_date,end_date):
     Output("casosnovos-graph","figure")
     ],
     [
-    Input("location-dropdown", "value")
+    Input("location-dropdown", "value"),
+    Input("datepicker-range", "start_date"),
+    Input("datepicker-range", "end_date")
     ]
 )
-def display_graph(location):
+def display_graph(location, start_date, end_date):
     if not location:
-        df_data_on_location = df_graficocasos.assign(casos=df_graficocasos['casos'].sum())
-        df_data_on_location = df_data_on_location.assign(casos_novos=df_data_on_location['casos_novos'].sum())# SOMAR PARA TRAZER ESTADO DE SP
+        df_data_on_location = df_estadotratado[(df_estadotratado['datahora'] >= start_date) & (df_estadotratado['datahora'] <= end_date)]
+        # df_data_on_location = df_data_on_location.assign(casos=df_data_on_location['casos'].sum())
+        # df_data_on_location = df_data_on_location.assign(casos_novos=df_data_on_location['casos_novos'].sum())# SOMAR PARA TRAZER ESTADO DE SP
     else:
-        df_data_on_location = df_graficocasos[df_graficocasos["nome_munic"] == location]
+        df_data_on_location = df_tratado[df_tratado["nome_munic"] == location]
+        df_data_on_location = df_data_on_location[(df_data_on_location['datahora'] >= start_date) & (df_data_on_location['datahora'] <= end_date)]
 
-    fig1 = [{
-        'x': (df_data_on_location["datahora"]),
-        'y': (df_data_on_location["casos"]),
-        'mode': 'lines',
-        'layout': {
-            'title': 'Casos Acumulados'}
-    }]
-    fig2 = [{
-        'x': (df_data_on_location["datahora"]),
-        'y': (df_data_on_location["casos_novos"]),
-        'mode': 'bar',
-        'layout': {
-            'title': 'Casos Novos'}
-    }]
-    return{
-        'data':fig1
-    },{'data': fig2}
+    # upgrade graficos
+    fig1.update_traces(go.Scatter(x=df_data_on_location["datahora"], y=df_data_on_location["casos"]))
+    fig2.update_traces(go.Bar(x=df_data_on_location["datahora"], y=df_data_on_location["casos_novos"],text=df_data_on_location["casos_novos"]))
+
+    return (
+        fig1, fig2
+    )
 
 
 # Chamada do modal SOBRE
