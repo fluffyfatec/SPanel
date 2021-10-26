@@ -30,7 +30,7 @@ def opcao1(mensagem):
 def opcao2(mensagem):
     bot.send_message(mensagem.chat.id, """ SPanel é um projeto de estudantes da FATEC SJC que visa informar dados atualizados sobre a Covid19 no estado de São Paulo. Para mais informações entrar em contato via E-mail.
 
-E-mail (fluffyfatec@gmail.com")
+E-mail (fluffyfatec@gmail.com)
 GitHub (https://github.com/fluffyfatec)""")
 
 
