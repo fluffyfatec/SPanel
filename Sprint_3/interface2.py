@@ -25,20 +25,21 @@ df_graficocasos = df_tratado.drop(
     columns=['obitos','obitos_novos','pop'])
 
 # ==================================================================
-df_data_on_location = df_graficocasos.assign(casos=df_graficocasos['casos'].sum())
-df_data_on_location = df_data_on_location.assign(casos_novos=df_data_on_location['casos_novos'].sum())# SOMAR PARA TRAZER ESTADO DE SP
+# df_data_on_location = df_graficocasos.assign(casos=df_graficocasos['casos'].sum())
+# df_data_on_location = df_data_on_location.assign(casos_novos=df_data_on_location['casos_novos'].sum())# SOMAR PARA TRAZER ESTADO DE SP
 # Graficos
-fig1 = go.Figure()
-fig1.add_trace(go.Scatter(x=df_data_on_location["datahora"], y=df_data_on_location["casos"]))
-fig1.update_layout(
-    autosize=True,
-    margin = dict(l=50, r=50, t=50, b=50),
-)
-fig2 = go.Figure()
-fig2.add_trace(go.Bar(x=df_data_on_location["datahora"], y=df_data_on_location["casos_novos"]))
-fig2.update_layout(
-    autosize=True,
-    margin = dict(l=50, r=50, t=50, b=50))
+# fig1 = go.Figure()
+# fig1.add_trace(go.Scatter(x=df_data_on_location["datahora"], y=df_data_on_location["casos"]))
+# fig1.update_layout(
+#     autosize=True,
+#     margin = dict(l=50, r=50, t=50, b=50),
+# )
+#
+# fig2 = go.Figure()
+# fig2.add_trace(go.Bar(x=df_data_on_location["datahora"], y=df_data_on_location["casos_novos"]))
+# fig2.update_layout(
+#     autosize=True,
+#     margin = dict(l=50, r=50, t=50, b=50))
 
 # ==================================================================
 # Layout
@@ -441,10 +442,10 @@ app.layout = dbc.Container([
     ])
     ,dbc.Row([
         dbc.Col([
-            dcc.Graph(id="casos-graph",figure = fig1)
+            dcc.Graph(id="casos-graph")
         ],md=6)
         ,dbc.Col([
-            dcc.Graph(id="casosnovos-graph",figure = fig2)
+            dcc.Graph(id="casosnovos-graph")
         ],md=6)
     ])
 ], fluid=True)
@@ -533,26 +534,30 @@ def display_status(location, start_date,end_date):
     Input("location-dropdown", "value")
     ]
 )
-def plot_line_graph(location):
+def display_graph(location):
     if not location:
         df_data_on_location = df_graficocasos.assign(casos=df_graficocasos['casos'].sum())
         df_data_on_location = df_data_on_location.assign(casos_novos=df_data_on_location['casos_novos'].sum())# SOMAR PARA TRAZER ESTADO DE SP
     else:
         df_data_on_location = df_graficocasos[df_graficocasos["nome_munic"] == location]
 
-    fig1.update_traces(go.Scatter(x=df_data_on_location["datahora"], y=df_data_on_location["casos"],name=location))
-    fig1.update_layout(
-        autosize=True,
-        margin=dict(l=50, r=50, t=50, b=50),
-    )
-
-    fig2.update_traces(go.Bar(x=df_data_on_location["datahora"], y=df_data_on_location["casos_novos"]))
-    fig2.update_layout(
-        autosize=True,
-        margin=dict(l=50, r=50, t=50, b=50))
-    return(
-        fig1,fig2
-    )
+    fig1 = [{
+        'x': (df_data_on_location["datahora"]),
+        'y': (df_data_on_location["casos"]),
+        'mode': 'lines',
+        'layout': {
+            'title': 'Casos Acumulados'}
+    }]
+    fig2 = [{
+        'x': (df_data_on_location["datahora"]),
+        'y': (df_data_on_location["casos_novos"]),
+        'mode': 'bar',
+        'layout': {
+            'title': 'Casos Novos'}
+    }]
+    return{
+        'data':fig1
+    },{'data': fig2}
 
 
 # Chamada do modal SOBRE
