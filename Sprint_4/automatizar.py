@@ -18,10 +18,12 @@ async def main():
         async with page.expect_download() as download_info:
             download = await download_info.value
             path = await download.path()
-            await download.save_as('./docs/Database_covid19.csv')
+            await download.save_as('./docs/df_state.csv')
             print(download.url, path)
             await page.close()
             await browser.close()
 
 asyncio.run(main())
+
+
 
