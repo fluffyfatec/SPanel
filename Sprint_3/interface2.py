@@ -27,6 +27,8 @@ list_municipios = sorted(df_tratado['nome_munic'].unique()) #formatação de mun
 fig1 = go.Figure()
 fig1.add_trace(go.Scatter(x=df_estadotratado["datahora"], y=df_estadotratado["casos"],line=dict(color='#db261f')))
 fig1.update_layout(
+    yaxis=dict(showline=True,showticklabels=True,linewidth=2,linecolor='rgb(204, 204, 204)'),
+    xaxis=dict(showline=True,showticklabels=True,linewidth=2,linecolor='rgb(204, 204, 204)'),
     title='<b>Casos Acumulados por Período\b',
     font=dict(family='Gill Sans, sans-serif',size=12,color='#1f1b18'),
     xaxis_title='Data',
@@ -40,10 +42,41 @@ fig1.update_layout(
 fig2 = go.Figure()
 fig2.add_trace(go.Bar(x=df_estadotratado["datahora"], y=df_estadotratado["casos_novos"],text=df_estadotratado["casos_novos"],marker_color='#db261f'),)
 fig2.update_layout(
+    yaxis=dict(showline=True,showticklabels=True,linewidth=2,linecolor='rgb(204, 204, 204)'),
+    xaxis=dict(showline=True,showticklabels=True,linewidth=2,linecolor='rgb(204, 204, 204)'),
     title='<b>Casos Novos por Período\b',
     font=dict(family='Gill Sans, sans-serif',size=12,color='#1f1b18'),
     xaxis_title='Data',
     yaxis_title='Casos Novos',
+    plot_bgcolor='white',
+    title_x = 0.5,
+    autosize=True,
+    margin = dict(l=90, r=50, t=80, b=70))
+
+fig3 = go.Figure()
+fig3.add_trace(go.Scatter(x=df_estadotratado["datahora"], y=df_estadotratado["obitos"],line=dict(color='#db261f')))
+fig3.update_layout(
+    yaxis=dict(showline=True,showticklabels=True,linewidth=2,linecolor='rgb(204, 204, 204)'),
+    xaxis=dict(showline=True,showticklabels=True,linewidth=2,linecolor='rgb(204, 204, 204)'),
+    title='<b>Óbitos Acumulados por Período\b',
+    font=dict(family='Gill Sans, sans-serif',size=12,color='#1f1b18'),
+    xaxis_title='Data',
+    yaxis_title='Óbitos Acumulados',
+    plot_bgcolor='white',
+    title_x = 0.5,
+    autosize=True,
+    margin = dict(l=100, r=50, t=80, b=70),
+)
+
+fig4 = go.Figure()
+fig4.add_trace(go.Bar(x=df_estadotratado["datahora"], y=df_estadotratado["obitos_novos"],text=df_estadotratado["obitos_novos"],marker_color='#db261f'),)
+fig4.update_layout(
+    yaxis=dict(showline=True,showticklabels=True,linewidth=2,linecolor='rgb(204, 204, 204)'),
+    xaxis=dict(showline=True,showticklabels=True,linewidth=2,linecolor='rgb(204, 204, 204)'),
+    title='<b>Óbitos Novos por Período\b',
+    font=dict(family='Gill Sans, sans-serif',size=12,color='#1f1b18'),
+    xaxis_title='Data',
+    yaxis_title='Óbitos Novos',
     plot_bgcolor='white',
     title_x = 0.5,
     autosize=True,
@@ -445,7 +478,7 @@ app.layout = dbc.Container([
         dbc.Col([
             dcc.Markdown(['''>
             > Casos Confirmados
-            >'''],className="lb_imunizados")
+            >'''],className="lb_imunizados",style={'margin-top':'40px'})
         ])
     ])
     ,dbc.Row([
@@ -455,6 +488,28 @@ app.layout = dbc.Container([
         ,dbc.Col([
             dcc.Graph(id="casosnovos-graph",className = 'graph2')
         ],md=6)
+    ])
+    ,dbc.Row([
+        dbc.Col([
+            dcc.Markdown(['''>
+        > Óbitos Confirmados
+        >'''], className="lb_imunizados",style={'margin-top':'40px'})
+        ])
+    ])
+    ,dbc.Row([
+        dbc.Col([
+            dcc.Graph(id="obitos-graph",className = 'graph1',)
+        ],md=6)
+        ,dbc.Col([
+            dcc.Graph(id="obitosnovos-graph",className = 'graph2')
+        ],md=6)
+    ])
+    ,dbc.Row([
+        dbc.Col([
+            dcc.Markdown(['''>
+        > População
+        >'''], className="lb_imunizados",style={'margin-top':'40px'})
+        ])
     ])
 ], fluid=True)
 
@@ -535,7 +590,9 @@ def display_status(location, start_date,end_date):
 @app.callback(
     [
     Output("casos-graph","figure"),
-    Output("casosnovos-graph","figure")
+    Output("casosnovos-graph","figure"),
+    Output("obitos-graph","figure"),
+    Output("obitosnovos-graph","figure")
     ],
     [
     Input("location-dropdown", "value"),
@@ -555,9 +612,12 @@ def display_graph(location, start_date, end_date):
     # upgrade graficos
     fig1.update_traces(go.Scatter(x=df_data_on_location["datahora"], y=df_data_on_location["casos"]))
     fig2.update_traces(go.Bar(x=df_data_on_location["datahora"], y=df_data_on_location["casos_novos"],text=df_data_on_location["casos_novos"]))
+    fig3.update_traces(go.Scatter(x=df_data_on_location["datahora"], y=df_data_on_location["obitos"]))
+    fig4.update_traces(go.Bar(x=df_data_on_location["datahora"], y=df_data_on_location["obitos_novos"],
+                              text=df_data_on_location["obitos_novos"]))
 
     return (
-        fig1, fig2
+        fig1, fig2, fig3, fig4
     )
 
 
