@@ -7,7 +7,9 @@ import dash_core_components as dcc
 import dash_html_components as html
 from dash.dependencies import Input, Output, State
 import dash_bootstrap_components as dbc
-import plotly.express as px
+
+# ==================================================================
+# Bibliotecas dos graficos
 import plotly.graph_objects as go
 
 # ==================================================================
@@ -19,11 +21,18 @@ import pandas as pd
 df_tratado = pd.read_csv("docs/df_tratado.csv")
 df_vacinastratado = pd.read_csv("docs/df_vacinastratado.csv")
 df_estadotratado = pd.read_csv("docs/df_estadotratado.csv")
-#df_tratado['datahora'] = pd.to_datetime(df_tratado['datahora'],format='%d/%m/%Y') #formatação de datahotra
+df_vacinas = pd.read_csv("docs/vacinas.csv", sep=';')
 list_municipios = sorted(df_tratado['nome_munic'].unique()) #formatação de municipios
 
 # ==================================================================
 # Graficos
+
+# Grafico pizza imunizados
+fig0 = go.Figure()
+fig0.add_trace(go.Pie(values= df_vacinas["Total Doses Aplicadas"], labels=df_vacinas["Dose"]))
+fig0.update_layout(title='Imunização')
+
+# Grafico linha casos
 fig1 = go.Figure()
 fig1.add_trace(go.Scatter(x=df_estadotratado["datahora"], y=df_estadotratado["casos"],line=dict(color='#db261f')))
 fig1.update_layout(
@@ -39,6 +48,7 @@ fig1.update_layout(
     margin = dict(l=100, r=50, t=80, b=70),
 )
 
+# Grafico bar casos novos
 fig2 = go.Figure()
 fig2.add_trace(go.Bar(x=df_estadotratado["datahora"], y=df_estadotratado["casos_novos"],text=df_estadotratado["casos_novos"],marker_color='#db261f'),)
 fig2.update_layout(
@@ -53,6 +63,7 @@ fig2.update_layout(
     autosize=True,
     margin = dict(l=90, r=50, t=80, b=70))
 
+# Grafico linhas obitos
 fig3 = go.Figure()
 fig3.add_trace(go.Scatter(x=df_estadotratado["datahora"], y=df_estadotratado["obitos"],line=dict(color='#db261f')))
 fig3.update_layout(
@@ -68,6 +79,7 @@ fig3.update_layout(
     margin = dict(l=100, r=50, t=80, b=70),
 )
 
+# Grafico bar obitos novos
 fig4 = go.Figure()
 fig4.add_trace(go.Bar(x=df_estadotratado["datahora"], y=df_estadotratado["obitos_novos"],text=df_estadotratado["obitos_novos"],marker_color='#db261f'),)
 fig4.update_layout(
@@ -305,7 +317,7 @@ app.layout = dbc.Container([
 
 # ==================================================================
     # Linha 2 - Vacinados, Casos, Obitos e População
-    , dbc.Row([
+    ,dbc.Row([
         # Coluna 1 - Vacinados
         dbc.Col([
             dbc.Card([
@@ -459,26 +471,26 @@ app.layout = dbc.Container([
             ], color="#201b17",className='cards',style={"margin-right": "5px"})
         ], md=3)
     ], style={"border-bottom": "10px solid #f1f1f1", "background-image": "linear-gradient(#1f1b18 50%, #f1f1f1 50%)"})
-    , dbc.Row([
+    ,dbc.Row([
         dbc.Col([
             dcc.Markdown(['''>
         > Imunizados
         >'''], className="lb_imunizados")
         ])
     ])
-    , dbc.Row([
+    ,dbc.Row([
         dbc.Col([
-            #dcc.Graph(id="casos-graph4", figure=fig1) #COLOCA AQUI OS GRAFICOS IMUNIZADOS LUIZ
+            dcc.Graph(id="vacinas-graph")
         ], md=6)
         , dbc.Col([
-            #dcc.Graph(id="casos-graph3", figure=fig1) #E AQUI TAMBÉM, PODE TIRAR ESSES DOIS
+            #GRAFICO2 CARD 1
         ], md=6)
     ])
     ,dbc.Row([
         dbc.Col([
             dcc.Markdown(['''>
             > Casos Confirmados
-            >'''],className="lb_imunizados",style={'margin-top':'40px'})
+            >'''],className="lb_imunizados",style={'margin-top':'50px'})
         ])
     ])
     ,dbc.Row([
@@ -493,7 +505,7 @@ app.layout = dbc.Container([
         dbc.Col([
             dcc.Markdown(['''>
         > Óbitos Confirmados
-        >'''], className="lb_imunizados",style={'margin-top':'40px'})
+        >'''], className="lb_imunizados",style={'margin-top':'50px'})
         ])
     ])
     ,dbc.Row([
@@ -508,13 +520,16 @@ app.layout = dbc.Container([
         dbc.Col([
             dcc.Markdown(['''>
         > População
-        >'''], className="lb_imunizados",style={'margin-top':'40px'})
+        >'''], className="lb_imunizados",style={'margin-top':'50px'})
         ])
     ])
 ], fluid=True)
 
 # ==================================================================
 # Interatividade
+
+# ==================================================================
+# Cards
 @app.callback(
     [
         Output("imunizados-text", "children"),
@@ -536,11 +551,6 @@ def display_status(location, start_date,end_date):
     if not location:
         df_data_var_date = df_estadotratado[(df_estadotratado['datahora'] >= start_date) & (df_estadotratado['datahora'] <= end_date)]
         df_data_on_date = df_estadotratado[(df_estadotratado["datahora"] == end_date)]
-        # df_data_var_date = df_data_var_date.assign(obitos_novos=df_data_var_date['obitos_novos'].sum())# SOMAR PARA TRAZER ESTADO DE SP
-        # df_data_on_date = df_data_on_date.assign(obitos=df_data_on_date['obitos'].sum())  # SOMAR PARA TRAZER ESTADO DE SP
-        # df_data_var_date = df_data_var_date.assign(casos_novos=df_data_var_date['casos_novos'].sum())  # SOMAR PARA TRAZER ESTADO DE SP
-        # df_data_on_date = df_data_on_date.assign(casos=df_data_on_date['casos'].sum())  # SOMAR PARA TRAZER ESTADO DE SP
-        # df_data_on_date = df_data_on_date.assign(pop=df_data_on_date['pop'].sum())  # SOMAR PARA TRAZER ESTADO DE SP
         df_data_vacinastratado = df_vacinastratado.assign(doseunica=df_vacinastratado["doseunica"].sum())
         df_data_vacinastratado = df_data_vacinastratado.assign(segundadose=df_data_vacinastratado["segundadose"].sum())
         df_data_vacinastratado = df_data_vacinastratado.assign(Imunizados=df_data_vacinastratado['doseunica'] + df_data_vacinastratado['segundadose'])  # SOMAR PARA TRAZER ESTADO DE SP
@@ -586,7 +596,31 @@ def display_status(location, start_date,end_date):
             populacao,
             f'{letalidade}%')
 
+# ==================================================================
 # Chamada graficos
+
+# ==================================================================
+# Grafico Card 1
+@app.callback(
+    Output("vacinas-graph", "figure"),
+    [
+    Input("location-dropdown", "value")
+    ]
+)
+def display_vacinas(location):
+    if not location:
+        df_data_vacinas = df_vacinas[df_vacinas["Município"] == location] #alterar para dados do estado
+    else:
+        df_data_vacinas = df_vacinas[df_vacinas["Município"] == location]
+
+    # update grafico
+    fig0.update_traces(go.Pie(values= df_data_vacinas["Total Doses Aplicadas"],labels=df_data_vacinas["Dose"]))
+    return (
+        fig0
+    )
+
+# ==================================================================
+# Grafico Card 2 e 3
 @app.callback(
     [
     Output("casos-graph","figure"),
@@ -603,19 +637,15 @@ def display_status(location, start_date,end_date):
 def display_graph(location, start_date, end_date):
     if not location:
         df_data_on_location = df_estadotratado[(df_estadotratado['datahora'] >= start_date) & (df_estadotratado['datahora'] <= end_date)]
-        # df_data_on_location = df_data_on_location.assign(casos=df_data_on_location['casos'].sum())
-        # df_data_on_location = df_data_on_location.assign(casos_novos=df_data_on_location['casos_novos'].sum())# SOMAR PARA TRAZER ESTADO DE SP
     else:
         df_data_on_location = df_tratado[df_tratado["nome_munic"] == location]
         df_data_on_location = df_data_on_location[(df_data_on_location['datahora'] >= start_date) & (df_data_on_location['datahora'] <= end_date)]
 
-    # upgrade graficos
+    # update graficos
     fig1.update_traces(go.Scatter(x=df_data_on_location["datahora"], y=df_data_on_location["casos"]))
     fig2.update_traces(go.Bar(x=df_data_on_location["datahora"], y=df_data_on_location["casos_novos"],text=df_data_on_location["casos_novos"]))
     fig3.update_traces(go.Scatter(x=df_data_on_location["datahora"], y=df_data_on_location["obitos"]))
-    fig4.update_traces(go.Bar(x=df_data_on_location["datahora"], y=df_data_on_location["obitos_novos"],
-                              text=df_data_on_location["obitos_novos"]))
-
+    fig4.update_traces(go.Bar(x=df_data_on_location["datahora"], y=df_data_on_location["obitos_novos"],text=df_data_on_location["obitos_novos"]))
     return (
         fig1, fig2, fig3, fig4
     )
