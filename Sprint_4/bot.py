@@ -1,5 +1,5 @@
 import telebot
-
+# t.me/fluffyapi_bot   caminho para o bot
 CHAVE_API = "2054963815:AAF-v9jj4Jw8gDiwEXC7OZAMXXn5fy1LZjA"
 
 bot = telebot.TeleBot(CHAVE_API)
