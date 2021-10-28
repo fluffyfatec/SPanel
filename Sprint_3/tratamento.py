@@ -40,14 +40,21 @@ df_primeira = df_primeira.drop(
     columns=['Dose'])
 # ==================================================================
 df_segunda = df[df['Dose'] =='2° DOSE']
-df_segunda= df_segunda.rename(
+df_segunda = df_segunda.rename(
     columns={'Total Doses Aplicadas':'segundadose'})
 df_segunda = df_segunda.drop(
     columns=['Dose'])
+# ==================================================================
+df_terceira = df[df['Dose'] =='3º DOSE']
+df_terceira = df_terceira.rename(
+    columns={'Total Doses Aplicadas':'terceiraadose'})
+df_terceira = df_terceira.drop(
+    columns=['Dose'])
 
 # Junção das doses no df_vacinas
-df_vacinastratado = pd.merge(df_unica,df_segunda , how='inner', on='nome_munic')
-df_vacinastratado = pd.merge(df_vacinastratado,df_primeira , how='inner', on='nome_munic')
+df_vacinastratado = pd.merge(df_unica,df_primeira, how='inner', on='nome_munic')
+df_vacinastratado = pd.merge(df_vacinastratado,df_segunda, how='inner', on='nome_munic')
+df_vacinastratado = pd.merge(df_vacinastratado,df_terceira, how='inner', on='nome_munic')
 df_vacinastratado.fillna(('-'), inplace=True)
 
 # Junção das vacinas.csv e df_state.csv no df_tratado.csv
