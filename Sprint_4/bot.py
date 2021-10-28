@@ -1,17 +1,21 @@
 import telebot
+import pandas as pd
 # t.me/fluffyapi_bot   caminho para o bot
 CHAVE_API = "2054963815:AAF-v9jj4Jw8gDiwEXC7OZAMXXn5fy1LZjA"
 
 bot = telebot.TeleBot(CHAVE_API)
 
+#obitos
 @bot.message_handler(commands=["obitos"])
 def obitos(mensagem):
     bot.send_message(mensagem.chat.id, "Ops ainda não temos dados")
 
+#imunizados
 @bot.message_handler(commands=["imunizados"])
 def imunizados(mensagem):
     bot.send_message(mensagem.chat.id, "Ops ainda não temos dados")
 
+#novos casos no periodo
 @bot.message_handler(commands=["novoscasos"])
 def novoscasos(mensagem):
     bot.send_message(mensagem.chat.id, "Ops ainda não temos dados")
