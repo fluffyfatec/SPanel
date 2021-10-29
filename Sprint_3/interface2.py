@@ -28,14 +28,15 @@ list_municipios = sorted(df_tratado['nome_munic'].unique()) #formatação de mun
 # Graficos
 
 # Grafico pizza imunizados
+colors = ['#BDBDBD','#757575','#db261f','#1f1b18']
 fig0 = go.Figure()
-fig0.add_trace(go.Pie(values= df_vacinas["Total Doses Aplicadas"], labels=df_vacinas["Dose"]))
+fig0.add_trace(go.Pie(values= df_vacinas["Total Doses Aplicadas"], labels=df_vacinas["Dose"],hole=.3,marker=dict(colors=colors)))
 fig0.update_layout(
-    title_text='<b>Imunização\b',
-    font=dict(family='Gill Sans, sans-serif',size=14,color='#1f1b18'),
+    title_text='<b>Vacinomêtro\b',
+    font=dict(family='Gill Sans, sans-serif',size=12,color='#1f1b18'),
     title_x = 0.5,
     autosize=True,
-    margin = dict(l=90, r=50, t=80, b=70),
+    margin = dict(l=100, r=50, t=80, b=70),
 )
 
 # Grafico linha casos
@@ -481,22 +482,22 @@ app.layout = dbc.Container([
         dbc.Col([
             dcc.Markdown(['''>
         > Imunizados
-        >'''], className="lb_imunizados")
+        >'''], className="lb_imunizados",style={'margin-top':'30px','margin-left':'10px'})
         ])
     ])
     ,dbc.Row([
         dbc.Col([
-            dcc.Graph(id="vacinas-graph")
+            dcc.Graph(id="vacinas-graph",className = 'graph1')
         ], md=6)
         , dbc.Col([
-            #GRAFICO2 CARD 1
+            dcc.Graph(id="vacinas-graph2",className = 'graph2')
         ], md=6)
     ])
     ,dbc.Row([
         dbc.Col([
             dcc.Markdown(['''>
             > Casos Confirmados
-            >'''],className="lb_imunizados",style={'margin-top':'50px'})
+            >'''],className="lb_imunizados",style={'margin-top':'40px','margin-left':'10px'})
         ])
     ])
     ,dbc.Row([
@@ -511,7 +512,7 @@ app.layout = dbc.Container([
         dbc.Col([
             dcc.Markdown(['''>
         > Óbitos Confirmados
-        >'''], className="lb_imunizados",style={'margin-top':'50px'})
+        >'''], className="lb_imunizados",style={'margin-top':'40px','margin-left':'10px'})
         ])
     ])
     ,dbc.Row([
@@ -526,9 +527,18 @@ app.layout = dbc.Container([
         dbc.Col([
             dcc.Markdown(['''>
         > População
-        >'''], className="lb_imunizados",style={'margin-top':'50px'})
+        >'''], className="lb_imunizados",style={'margin-top':'40px','margin-left':'10px'})
         ])
     ])
+    ,dbc.Row([
+        dbc.Col([
+            html.Div([
+                html.H6("Painel de COVID-19 do Estado de São Paulo | ©Fluffy2021",style={"color":"#1f1b18","margin-top":"20px",'text-align': 'center'}),
+                dcc.Link(children=html.Img(id="github-button", src="assets/github-button.png", width=25, style={"margin-top": "5px","margin-bottom":"20px",'display': 'block','margin-left': 'auto','margin-right': 'auto'}),href='https://github.com/fluffyfatec/SPanel/blob/main/Sprint_3/interface2.py',
+                         refresh=True)
+            ])
+        ])
+    ],style={"justify-content": "center"})
 ], fluid=True)
 
 # ==================================================================
@@ -617,9 +627,11 @@ def display_vacinas(location):
 
     if not location:
         soma_unica = df_vacinastratado['doseunica'].sum()
+        soma_terceira = df_vacinastratado['terceiradose'].sum()
         soma_segunda = df_vacinastratado['segundadose'].sum()
         soma_primeira = df_vacinastratado['primeiradose'].sum()
         df_data_vacinas = df_vacinas.append(dict(zip(df_vacinas.columns, ['Estado', 'UNICA', soma_unica])),ignore_index=True)
+        df_data_vacinas = df_data_vacinas.append(dict(zip(df_vacinas.columns, ['Estado', '3º DOSE', soma_terceira])),ignore_index=True)
         df_data_vacinas = df_data_vacinas.append(dict(zip(df_vacinas.columns, ['Estado', '2º DOSE', soma_segunda])),ignore_index=True)
         df_data_vacinas = df_data_vacinas.append(dict(zip(df_vacinas.columns, ['Estado', '1º DOSE', soma_primeira])),ignore_index=True)
         df_data_vacinas = df_data_vacinas.query('Município=="Estado"') #alterar para dados do estado
