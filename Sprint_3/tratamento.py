@@ -47,7 +47,7 @@ df_segunda = df_segunda.drop(
 # ==================================================================
 df_terceira = df[df['Dose'] =='3º DOSE']
 df_terceira = df_terceira.rename(
-    columns={'Total Doses Aplicadas':'terceiraadose'})
+    columns={'Total Doses Aplicadas':'terceiradose'})
 df_terceira = df_terceira.drop(
     columns=['Dose'])
 
