@@ -9,8 +9,9 @@ from dash.dependencies import Input, Output, State
 import dash_bootstrap_components as dbc
 
 # ==================================================================
-# Bibliotecas dos graficos
+# Bibliotecas dos graficos e tabelas
 import plotly.graph_objects as go
+import dash_table as dt
 
 # ==================================================================
 # Bibliotecas de manipulação de dados
@@ -23,7 +24,12 @@ df_vacinastratado = pd.read_csv("docs/df_vacinastratado.csv")
 df_estadotratado = pd.read_csv("docs/df_estadotratado.csv")
 df_vacinas = pd.read_csv("docs/vacinas.csv", sep=';')
 list_municipios = sorted(df_tratado['nome_munic'].unique()) #formatação de municipios
-
+list_tabela=['SÃO PAULO', 'GUARULHOS', 'CAMPINAS', 'SÃO BERNARDO DO CAMPO', 'SÃO JOSÉ DOS CAMPOS', 'SANTO ANDRÉ', 'RIBEIRÃO PRETO']
+df_tratado_rename = df_tratado.rename(
+                columns={'nome_munic': 'Município', 'casos': 'Casos Acumulados', 'datahora': 'Data da Atualização','casos_novos': 'Casos Novos',
+                         'obitos': "Óbitos Acumulados", "obitos_novos": "Óbitos Novos","pop": "População"})
+df_tratado_rename = pd.DataFrame(df_tratado_rename,
+                columns=['Município', 'Casos Acumulados', 'Casos Novos', 'Óbitos Acumulados', 'Óbitos Novos','População', 'Data da Atualização'])
 # ==================================================================
 # Graficos
 
@@ -32,7 +38,7 @@ colors = ['#BDBDBD','#757575','#db261f','#1f1b18']
 fig0 = go.Figure()
 fig0.add_trace(go.Pie(values= df_vacinas["Total Doses Aplicadas"], labels=df_vacinas["Dose"],hole=.3,marker=dict(colors=colors)))
 fig0.update_layout(
-    title_text='<b>Vacinomêtro\b',
+    title_text='<b>Vacinomêtro',
     font=dict(family='Gill Sans, sans-serif',size=12,color='#1f1b18'),
     title_x = 0.5,
     autosize=True,
@@ -41,11 +47,11 @@ fig0.update_layout(
 
 # Grafico linha casos
 fig1 = go.Figure()
-fig1.add_trace(go.Scatter(x=df_estadotratado["datahora"], y=df_estadotratado["casos"],line=dict(color='#db261f')))
+fig1.add_trace(go.Scatter(x=df_estadotratado["datahora"], y=df_estadotratado["casos"],fill='tozeroy',line=dict(color='#db261f')))
 fig1.update_layout(
-    yaxis=dict(showline=True,showticklabels=True,linewidth=2,linecolor='rgb(204, 204, 204)'),
-    xaxis=dict(showline=True,showticklabels=True,linewidth=2,linecolor='rgb(204, 204, 204)'),
-    title='<b>Casos Acumulados por Período\b',
+    yaxis=dict(ticks="outside",gridcolor='#f1f1f1',showline=True,showticklabels=True,linewidth=2,linecolor='rgb(204, 204, 204)'),
+    xaxis=dict(gridcolor='#f1f1f1',showline=True,showticklabels=True,linewidth=2,linecolor='rgb(204, 204, 204)'),
+    title='<b>Casos Acumulados por Período',
     font=dict(family='Gill Sans, sans-serif',size=12,color='#1f1b18'),
     xaxis_title='Data',
     yaxis_title='Casos Acumulados',
@@ -59,9 +65,9 @@ fig1.update_layout(
 fig2 = go.Figure()
 fig2.add_trace(go.Bar(x=df_estadotratado["datahora"], y=df_estadotratado["casos_novos"],text=df_estadotratado["casos_novos"],marker_color='#db261f'),)
 fig2.update_layout(
-    yaxis=dict(showline=True,showticklabels=True,linewidth=2,linecolor='rgb(204, 204, 204)'),
+    yaxis=dict(ticks="outside",gridcolor='#f1f1f1',showline=True,showticklabels=True,linewidth=2,linecolor='rgb(204, 204, 204)'),
     xaxis=dict(showline=True,showticklabels=True,linewidth=2,linecolor='rgb(204, 204, 204)'),
-    title='<b>Casos Novos por Período\b',
+    title='<b>Casos Novos por Período',
     font=dict(family='Gill Sans, sans-serif',size=12,color='#1f1b18'),
     xaxis_title='Data',
     yaxis_title='Casos Novos',
@@ -72,11 +78,11 @@ fig2.update_layout(
 
 # Grafico linhas obitos
 fig3 = go.Figure()
-fig3.add_trace(go.Scatter(x=df_estadotratado["datahora"], y=df_estadotratado["obitos"],line=dict(color='#db261f')))
+fig3.add_trace(go.Scatter(x=df_estadotratado["datahora"], y=df_estadotratado["obitos"],fill='tozeroy',line=dict(color='#db261f')))
 fig3.update_layout(
-    yaxis=dict(showline=True,showticklabels=True,linewidth=2,linecolor='rgb(204, 204, 204)'),
-    xaxis=dict(showline=True,showticklabels=True,linewidth=2,linecolor='rgb(204, 204, 204)'),
-    title='<b>Óbitos Acumulados por Período\b',
+    yaxis=dict(ticks="outside",gridcolor='#f1f1f1',showline=True,showticklabels=True,linewidth=2,linecolor='rgb(204, 204, 204)'),
+    xaxis=dict(gridcolor='#f1f1f1',showline=True,showticklabels=True,linewidth=2,linecolor='rgb(204, 204, 204)'),
+    title='<b>Óbitos Acumulados por Período',
     font=dict(family='Gill Sans, sans-serif',size=12,color='#1f1b18'),
     xaxis_title='Data',
     yaxis_title='Óbitos Acumulados',
@@ -90,9 +96,9 @@ fig3.update_layout(
 fig4 = go.Figure()
 fig4.add_trace(go.Bar(x=df_estadotratado["datahora"], y=df_estadotratado["obitos_novos"],text=df_estadotratado["obitos_novos"],marker_color='#db261f'),)
 fig4.update_layout(
-    yaxis=dict(showline=True,showticklabels=True,linewidth=2,linecolor='rgb(204, 204, 204)'),
+    yaxis=dict(ticks="outside", gridcolor='#f1f1f1',showline=True,showticklabels=True,linewidth=2,linecolor='rgb(204, 204, 204)'),
     xaxis=dict(showline=True,showticklabels=True,linewidth=2,linecolor='rgb(204, 204, 204)'),
-    title='<b>Óbitos Novos por Período\b',
+    title='<b>Óbitos Novos por Período',
     font=dict(family='Gill Sans, sans-serif',size=12,color='#1f1b18'),
     xaxis_title='Data',
     yaxis_title='Óbitos Novos',
@@ -311,7 +317,7 @@ app.layout = dbc.Container([
                 # Dropdown de Municipios
                 dbc.Col([
                     html.Div([
-                        dcc.Dropdown(id="location-dropdown",
+                        dcc.Dropdown(id="location-dropdown",className="location-dropdown",
                                      options=[{"label": i, "value": i} for i in list_municipios]
                                      ,clearable=True,placeholder="Escolha um município",
                                      style={"background-color": "#1f1b18"}
@@ -478,6 +484,66 @@ app.layout = dbc.Container([
             ], color="#201b17",className='cards',style={"margin-right": "5px"})
         ], md=3)
     ], style={"border-bottom": "10px solid #f1f1f1", "background-image": "linear-gradient(#1f1b18 50%, #f1f1f1 50%)"})
+    , dbc.Row([
+        dbc.Col([
+                dbc.Card([
+                    dbc.CardBody([
+                         dcc.Dropdown(
+                                id='demo-dropdown',className="demo-dropdown",
+                                options=[{"label": i, "value": i} for i in list_municipios
+                                         ],
+                                value=list_tabela,
+                                multi=True
+                            ),
+                            # Tabela
+                            dt.DataTable(
+                                id='table',
+                                data=df_tratado_rename.to_dict('records'),
+                                columns=[{"name": i, "id": i} for i in sorted(df_tratado_rename.columns)],
+                                style_cell=dict(textAlign='right',style={"color": "black","font-weight": "bold",'font-family': 'Gill Sans, sans-serif',"padding-top":"10px",
+                                'minWidth': 95, 'width': 90, 'maxWidth': 95,'height': 200}),
+                                editable=False,
+                                sort_action="native",
+                                sort_mode="single",
+                                row_deletable=False,
+                                selected_columns=[],
+                                selected_rows=[],
+                                page_action="native",
+                                page_current=0,
+                                page_size=7,
+                                style_header={"color": "#f1f1f1","background-color":"#1f1b18",'font-family': 'Gill Sans, sans-serif',"font-weight": "bold"},
+                                style_data={"color": "#3B332D",'font-family': 'Gill Sans, sans-serif','border': '1px solid grey'},
+
+
+                            tooltip_conditional=[
+                                    {
+                                        'if': {
+                                            'filter_query': '{Município} contains "SÃO PAULO"'
+                                        },
+                                        'type': 'markdown',
+                                        'value': 'Uma das 10 maiores cidades do estado de São Paulo.'
+                                    }
+                                ],
+
+                                style_data_conditional=[
+                                    {
+                                        'if': {
+                                            'filter_query': '{Município} contains "SÃO PAULO"'
+                                        },
+
+                                        'backgroundColor': '#db261f',
+                                        'color': 'white',
+                                        'textDecoration': 'underline',
+                                        'textDecorationStyle': 'dotted',
+                                    }
+                                ],
+                                tooltip_delay=0,
+                                tooltip_duration=None
+                            )
+                        ])
+                    ],className='card-tabela')
+            ])
+        ])
     ,dbc.Row([
         dbc.Col([
             dcc.Markdown(['''>
@@ -568,12 +634,12 @@ def display_status(location, start_date,end_date):
         df_data_var_date = df_estadotratado[(df_estadotratado['datahora'] >= start_date) & (df_estadotratado['datahora'] <= end_date)]
         df_data_on_date = df_estadotratado[(df_estadotratado["datahora"] == end_date)]
         df_data_vacinastratado = df_vacinastratado.assign(doseunica=df_vacinastratado["doseunica"].sum())
+        df_data_vacinastratado = df_data_vacinastratado.assign(primeiradose=df_data_vacinastratado["primeiradose"].sum())
         df_data_vacinastratado = df_data_vacinastratado.assign(segundadose=df_data_vacinastratado["segundadose"].sum())
         df_data_vacinastratado = df_data_vacinastratado.assign(Imunizados=df_data_vacinastratado['doseunica'] + df_data_vacinastratado['segundadose'])  # SOMAR PARA TRAZER ESTADO DE SP
         df_data_on_date = df_data_on_date.assign(porcentagemimunizados=df_data_vacinastratado['Imunizados'] / df_data_on_date['pop'] * 100)
         decimals = 2
         df_data_on_date['porcentagemimunizados'] = df_data_on_date['porcentagemimunizados'].apply(lambda x: round(x, decimals))
-        df_data_vacinastratado = df_data_vacinastratado.assign(primeiradose=df_data_vacinastratado["primeiradose"].sum())
         df_data_on_date = df_data_on_date.assign(letalidade=df_data_on_date['obitos'] / df_data_on_date['casos'] * 100)
         df_data_on_date['letalidade'] = df_data_on_date['letalidade'].apply(lambda x: round(x, decimals))
     else:
@@ -583,7 +649,7 @@ def display_status(location, start_date,end_date):
         df_data_on_date = df_data_var_date[(df_data_var_date["datahora"] == end_date)]
         df_data_var_date = df_data_var_date.assign(obitos_novos=df_data_var_date['obitos_novos'].sum())
         df_data_var_date = df_data_var_date.assign(casos_novos=df_data_var_date['casos_novos'].sum())
-        df_data_vacinastratado = df_data_vacinastratado.assign(Imunizados=df_data_vacinastratado['doseunica'] + df_data_vacinastratado['segundadose'])
+        df_data_vacinastratado = df_data_vacinastratado.assign(Imunizados=df_data_vacinastratado['doseunica'] + df_data_vacinastratado['segundadose'])  # SOMAR PARA TRAZER ESTADO DE SP
         df_data_on_date = df_data_on_date.assign(porcentagemimunizados=df_data_vacinastratado['Imunizados'] / df_data_on_date['pop'] * 100)
         decimals = 2
         df_data_on_date['porcentagemimunizados'] = df_data_on_date['porcentagemimunizados'].apply(lambda x: round(x, decimals))
@@ -611,6 +677,24 @@ def display_status(location, start_date,end_date):
             novos_ob,
             populacao,
             f'{letalidade}%')
+
+
+#====================================================================
+# Chamada Tabela
+
+@app.callback(
+    Output("table", "data"),
+    Input("demo-dropdown", "value")
+)
+def update_table(location):
+
+    if location is not None:
+        date_column = df_tratado_rename["Data da Atualização"]
+        max = date_column.max()
+        row = df_tratado_rename.loc[df_tratado_rename["Data da Atualização"] == max]
+        df_municipios = row[row["Município"].isin(location)]
+        df_loc = df_municipios.to_dict('records')
+        return df_loc
 
 # ==================================================================
 # Chamada graficos
@@ -662,14 +746,17 @@ def display_vacinas(location):
 def display_graph(location, start_date, end_date):
     if not location:
         df_data_on_location = df_estadotratado[(df_estadotratado['datahora'] >= start_date) & (df_estadotratado['datahora'] <= end_date)]
+        df_data_on_acumulado = df_estadotratado[(df_estadotratado['datahora'] >= '2020-01-01') & (df_estadotratado['datahora'] <= end_date)]
     else:
         df_data_on_location = df_tratado[df_tratado["nome_munic"] == location]
         df_data_on_location = df_data_on_location[(df_data_on_location['datahora'] >= start_date) & (df_data_on_location['datahora'] <= end_date)]
+        df_data_on_acumulado = df_tratado[df_tratado["nome_munic"] == location]
+        df_data_on_acumulado = df_data_on_acumulado[(df_data_on_acumulado['datahora'] >= '2020-01-01') & (df_data_on_acumulado['datahora'] <= end_date)]
 
     # update graficos
-    fig1.update_traces(go.Scatter(x=df_data_on_location["datahora"], y=df_data_on_location["casos"]))
+    fig1.update_traces(go.Scatter(x=df_data_on_acumulado["datahora"], y=df_data_on_acumulado["casos"]))
     fig2.update_traces(go.Bar(x=df_data_on_location["datahora"], y=df_data_on_location["casos_novos"],text=df_data_on_location["casos_novos"]))
-    fig3.update_traces(go.Scatter(x=df_data_on_location["datahora"], y=df_data_on_location["obitos"]))
+    fig3.update_traces(go.Scatter(x=df_data_on_acumulado["datahora"], y=df_data_on_acumulado["obitos"]))
     fig4.update_traces(go.Bar(x=df_data_on_location["datahora"], y=df_data_on_location["obitos_novos"],text=df_data_on_location["obitos_novos"]))
     return (
         fig1, fig2, fig3, fig4
