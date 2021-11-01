@@ -24,12 +24,32 @@ df_vacinastratado = pd.read_csv("docs/df_vacinastratado.csv")
 df_estadotratado = pd.read_csv("docs/df_estadotratado.csv")
 df_vacinas = pd.read_csv("docs/vacinas.csv", sep=';')
 list_municipios = sorted(df_tratado['nome_munic'].unique()) #formatação de municipios
-list_tabela=['SÃO PAULO', 'GUARULHOS', 'CAMPINAS', 'SÃO BERNARDO DO CAMPO', 'SÃO JOSÉ DOS CAMPOS', 'SANTO ANDRÉ', 'RIBEIRÃO PRETO']
-df_tratado_rename = df_tratado.rename(
-                columns={'nome_munic': 'Município', 'casos': 'Casos Acumulados', 'datahora': 'Data da Atualização','casos_novos': 'Casos Novos',
-                         'obitos': "Óbitos Acumulados", "obitos_novos": "Óbitos Novos","pop": "População"})
-df_tratado_rename = pd.DataFrame(df_tratado_rename,
-                columns=['Município', 'Casos Acumulados', 'Casos Novos', 'Óbitos Acumulados', 'Óbitos Novos','População', 'Data da Atualização'])
+date_column = df_tratado["datahora"]
+max = date_column.max()
+row = df_tratado.loc[df_tratado["datahora"] == max]
+df_vacinastratadonotpop = df_vacinastratado.drop(columns=['pop'])
+df_totais = pd.merge(row,df_vacinastratadonotpop, how='inner', on='nome_munic')
+df_totais = df_totais.drop(
+    columns=['Unnamed: 0_x', 'Unnamed: 0_y'])
+df_tratado_rename = df_totais.rename(
+                columns={'nome_munic': 'Localização', 'casos': 'Casos Acumulados', 'datahora': 'Data da Atualização',
+                         'obitos': "Óbitos Acumulados","pop": "População","doseunica":"Dose Unica","primeiradose":"Primeira Dose",
+                         "segundadose":"Segunda Dose","terceiradose":"Terceira Dose"})
+df_tratado_rename = df_tratado_rename.reindex(
+                columns=['Localização', 'Casos Acumulados', 'Óbitos Acumulados','Dose Unica','Primeira Dose','Segunda Dose','Terceira Dose','População', 'Data da Atualização'])
+
+casosacumulados = df_tratado_rename["Casos Acumulados"].sum()
+obitossacumulados = df_tratado_rename["Óbitos Acumulados"].sum()
+doseunica = df_tratado_rename["Dose Unica"].sum()
+primeiradose = df_tratado_rename["Primeira Dose"].sum()
+segundadose = df_tratado_rename["Segunda Dose"].sum()
+terceiradose = df_tratado_rename["Terceira Dose"].sum()
+populacao = df_tratado_rename["População"].sum()
+data = df_tratado_rename['Data da Atualização'].max()
+df_tratado_rename = df_tratado_rename.append(dict(zip(df_tratado_rename.columns, ['ESTADO DE SÃO PAULO', casosacumulados,obitossacumulados,doseunica,primeiradose,segundadose,terceiradose,populacao,data])),ignore_index=True)
+list_tabela=['ESTADO DE SÃO PAULO','SÃO PAULO', 'GUARULHOS', 'CAMPINAS', 'SÃO BERNARDO DO CAMPO', 'SÃO JOSÉ DOS CAMPOS', 'SANTO ANDRÉ']
+list_municipios2 = sorted(df_tratado_rename['Localização'].unique())
+
 # ==================================================================
 # Graficos
 # Grafico bar casos novos
@@ -121,6 +141,7 @@ fig4.update_layout(
     autosize=True,
     margin = dict(l=90, r=50, t=80, b=70))
 
+# Grafico de linha letalidade
 fig6 = go.Figure()
 fig6.add_trace(go.Scatter(x=df_tratado["datahora"], y=df_tratado["casos_novos"], fill='tozeroy',line=dict(color='#db261f')))
 fig6.update_layout(
@@ -139,7 +160,7 @@ fig6.update_layout(
 # ==================================================================
 # Layout
 app = dash.Dash(__name__, external_stylesheets=[dbc.themes.SANDSTONE],title='SPanel | COVID-19',update_title="Iniciando...")
-app.layout = dbc.Container([
+app.layout = dbc.Spinner(dbc.Container([
     # Linha 1 - Cabeçario
     dbc.Row([
         # Dados e logotipo
@@ -588,17 +609,18 @@ app.layout = dbc.Container([
                     dbc.CardBody([
                          dcc.Dropdown(
                                 id='demo-dropdown',className="demo-dropdown",
-                                options=[{"label": i, "value": i} for i in list_municipios
-                                         ],
+                                options=[{"label": i, "value": i} for i in list_municipios2],
                                 value=list_tabela,
-                                placeholder="Escolha um município",
+                                persistence = "ESTADO DE SÃO PAULO",
+                                placeholder="Escolha uma localidade",
+                                clearable=True,
                                 multi=True
                             ),
                             # Tabela
                             dt.DataTable(
                                 id='table',
                                 data=df_tratado_rename.to_dict('records'),
-                                columns=[{"name": i, "id": i} for i in sorted(df_tratado_rename.columns)],
+                                columns=[{"name": i, "id": i} for i in (df_tratado_rename.columns)],
                                 style_cell=dict(textAlign='right',style={"color": "black","font-weight": "bold",'font-family': 'Gill Sans, sans-serif',"padding-top":"10px",
                                 'minWidth': 95, 'width': 95, 'maxWidth': 95,'height': 200}),
                                 editable=False,
@@ -609,20 +631,17 @@ app.layout = dbc.Container([
                                 selected_rows=[],
                                 page_current=0,
                                 page_action="native",
-                                fixed_rows={'headers': True},
+                                fixed_rows={'headers': True,'data': 1},
                                 style_table={'overflowY': 'auto','height': '245px'},
                                 style_header={"color": "#f1f1f1","background-color":"#1f1b18",'font-family': 'Gill Sans, sans-serif',"font-weight": "bold"},
                                 style_data={"color": "#3B332D",'font-family': 'Gill Sans, sans-serif','border': '1px solid grey','whiteSpace': 'normal'},
                                 style_data_conditional=[
                                     {
                                         'if': {
-                                            'filter_query': '{Município} contains "SÃO PAULO"'
+                                            'filter_query': '{Localização} contains "ESTADO DE SÃO PAULO"'
                                         },
-
                                         'backgroundColor': '#db261f',
                                         'color': 'white',
-                                        'textDecoration': 'underline',
-                                        'textDecorationStyle': 'dotted',
                                     }
                                 ],
                                 tooltip_delay=0,
@@ -635,13 +654,21 @@ app.layout = dbc.Container([
     ,dbc.Row([
         dbc.Col([
             html.Div([
-                html.H6("Painel de COVID-19 do Estado de São Paulo | ©Fluffy2021",style={"color":"#1f1b18","margin-top":"30px",'text-align': 'center'}),
-                dcc.Link(children=html.Img(id="github-button", src="assets/github-button.png", width=25, style={"margin-top": "5px","margin-bottom":"20px",'display': 'block','margin-left': 'auto','margin-right': 'auto'}),href='https://github.com/fluffyfatec/SPanel/blob/main/Sprint_3/interface2.py',
+                dbc.Row([
+                    html.H6("Painel de COVID-19 do Estado de São Paulo | ©Fluffy2021",style={"color":"#1f1b18","margin-top":"30px",'text-align': 'center'}),
+                ],style={'display': 'block','margin-left': 'auto','margin-right': 'auto'}),
+                dbc.Row([
+                    dcc.Link(children=html.Img(id="github-button", src="assets/github-button.png", width=25, style={'position': 'absolute',"margin-top": "3px",'left': '48%','margin-right': '-53%'}),href='https://github.com/fluffyfatec/SPanel',
+                         refresh=True),
+                    dcc.Link(children=html.Img(id="instagram-button", src="assets/instagram-buttom.png", width=25, style={'position': 'absolute',"margin-top": "3px",'left': '50%','margin-right': '-50%'}),href='https://www.instagram.com/fluffyapi/',
+                         refresh=True),
+                    dcc.Link(children=html.Img(id="email-button", src="assets/email-button.png", width=25, style={'position': 'absolute',"margin-top": "3px",'left': '52%','margin-right': '-48%'}),href='fluffyfatec@gmail.com',
                          refresh=True)
+                ],style={"margin-bottom":"3%"})
             ])
         ])
     ],style={"justify-content": "center"})
-], fluid=True)
+], fluid=True,style={"background-color": "#f1f1f1"}),fullscreen=True,show_initially=True,spinnerClassName="spinner",type=None)
 
 # ==================================================================
 # Interatividade
@@ -672,10 +699,11 @@ def display_status(location, start_date,end_date):
         df_data_vacinastratado = df_vacinastratado.assign(doseunica=df_vacinastratado["doseunica"].sum())
         df_data_vacinastratado = df_data_vacinastratado.assign(primeiradose=df_data_vacinastratado["primeiradose"].sum())
         df_data_vacinastratado = df_data_vacinastratado.assign(segundadose=df_data_vacinastratado["segundadose"].sum())
+        df_data_vacinastratado = df_data_vacinastratado.assign(pop=df_data_vacinastratado["pop"].sum())
         df_data_vacinastratado = df_data_vacinastratado.assign(Imunizados=df_data_vacinastratado['doseunica'] + df_data_vacinastratado['segundadose'])  # SOMAR PARA TRAZER ESTADO DE SP
-        df_data_on_date = df_data_on_date.assign(porcentagemimunizados=df_data_vacinastratado['Imunizados'] / df_data_on_date['pop'] * 100)
+        df_data_vacinastratado = df_data_vacinastratado.assign(porcentagemimunizados=df_data_vacinastratado['Imunizados'] / df_data_vacinastratado['pop'] * 100)
         decimals = 2
-        df_data_on_date['porcentagemimunizados'] = df_data_on_date['porcentagemimunizados'].apply(lambda x: round(x, decimals))
+        df_data_vacinastratado['porcentagemimunizados'] = df_data_vacinastratado['porcentagemimunizados'].apply(lambda x: round(x, decimals))
         df_data_on_date = df_data_on_date.assign(letalidade=df_data_on_date['obitos'] / df_data_on_date['casos'] * 100)
         df_data_on_date['letalidade'] = df_data_on_date['letalidade'].apply(lambda x: round(x, decimals))
     else:
@@ -686,16 +714,16 @@ def display_status(location, start_date,end_date):
         df_data_var_date = df_data_var_date.assign(obitos_novos=df_data_var_date['obitos_novos'].sum())
         df_data_var_date = df_data_var_date.assign(casos_novos=df_data_var_date['casos_novos'].sum())
         df_data_vacinastratado = df_data_vacinastratado.assign(Imunizados=df_data_vacinastratado['doseunica'] + df_data_vacinastratado['segundadose'])  # SOMAR PARA TRAZER ESTADO DE SP
-        df_data_on_date = df_data_on_date.assign(porcentagemimunizados=df_data_vacinastratado['Imunizados'] / df_data_on_date['pop'] * 100)
+        df_data_vacinastratado = df_data_vacinastratado.assign(porcentagemimunizados=df_data_vacinastratado['Imunizados'] / df_data_vacinastratado['pop'] * 100)
         decimals = 2
-        df_data_on_date['porcentagemimunizados'] = df_data_on_date['porcentagemimunizados'].apply(lambda x: round(x, decimals))
+        df_data_vacinastratado['porcentagemimunizados'] = df_data_vacinastratado['porcentagemimunizados'].apply(lambda x: round(x, decimals))
         df_data_on_date = df_data_on_date.assign(letalidade=df_data_on_date['obitos'] / df_data_on_date['casos'] * 100)
         df_data_on_date['letalidade'] = df_data_on_date['letalidade'].apply(lambda x: round(x, decimals))
 
 # Filtrando caso os dados sejam vazios e trocando ',' por '.'
     imunizados = "-" if df_data_vacinastratado["Imunizados"].isna().values[0] else f'{int(df_data_vacinastratado["Imunizados"].values[0]):,}'.replace(",", ".")
     primeiradose = "-" if df_data_vacinastratado["primeiradose"].isna().values[0] else f'{int(df_data_vacinastratado["primeiradose"].values[0]):,}'.replace(",", ".")
-    porcentagemimunizados = "-" if df_data_on_date["porcentagemimunizados"].isna().values[0] else f'{float(df_data_on_date["porcentagemimunizados"].values[0]):,}'.replace(",", ".")
+    porcentagemimunizados = "-" if df_data_vacinastratado["porcentagemimunizados"].isna().values[0] else f'{float(df_data_vacinastratado["porcentagemimunizados"].values[0]):,}'.replace(",", ".")
     acumulados_novos = "-" if df_data_on_date["casos"].isna().values[0] else  f'{int(df_data_on_date["casos"].values[0]):,}'.replace(",", ".")
     novos_caso = "-" if df_data_var_date["casos_novos"].isna().values[0] else f'{int(df_data_var_date["casos_novos"].values[0]):,}'.replace(",", ".")
     obacumulados_novos = "-" if df_data_on_date["obitos"].isna().values[0] else f'{int(df_data_on_date["obitos"].values[0]):,}'.replace(",", ".")
@@ -728,7 +756,7 @@ def update_table(location):
         date_column = df_tratado_rename["Data da Atualização"]
         max = date_column.max()
         row = df_tratado_rename.loc[df_tratado_rename["Data da Atualização"] == max]
-        df_municipios = row[row["Município"].isin(location)]
+        df_municipios = row[row["Localização"].isin(location)]
         df_loc = df_municipios.to_dict('records')
         return df_loc
 
