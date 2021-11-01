@@ -32,18 +32,32 @@ df_tratado_rename = pd.DataFrame(df_tratado_rename,
                 columns=['Município', 'Casos Acumulados', 'Casos Novos', 'Óbitos Acumulados', 'Óbitos Novos','População', 'Data da Atualização'])
 # ==================================================================
 # Graficos
-
-# Grafico pizza imunizados
-colors = ['#BDBDBD','#757575','#db261f','#1f1b18']
+# Grafico bar casos novos
 fig0 = go.Figure()
-fig0.add_trace(go.Pie(values= df_vacinas["Total Doses Aplicadas"], labels=df_vacinas["Dose"],hole=.3,marker=dict(colors=colors)))
+fig0.add_trace(go.Bar(x=df_vacinas["Total Doses Aplicadas"], y=df_vacinas["Dose"],text=df_vacinas["Total Doses Aplicadas"],marker_color='#db261f',orientation='h'),)
 fig0.update_layout(
-    title_text='<b>Vacinomêtro',
+    yaxis=dict(showline=True,showticklabels=True,linewidth=2,linecolor='rgb(204, 204, 204)'),
+    xaxis=dict(ticks="outside",gridcolor='#f1f1f1',showline=True,showticklabels=True,linewidth=2,linecolor='rgb(204, 204, 204)'),
+    title='<b>Vacinas Aplicadas',
     font=dict(family='Gill Sans, sans-serif',size=12,color='#1f1b18'),
+    xaxis_title='Total de Doses Aplicadas',
+    yaxis_title='Dose',
+    plot_bgcolor='white',
     title_x = 0.5,
     autosize=True,
-    margin = dict(l=100, r=50, t=80, b=70),
-)
+    margin = dict(l=120, r=50, t=80, b=70))
+
+# Grafico pizza imunizados
+# colors = ['#BDBDBD','#757575','#db261f','#1f1b18']
+# fig0 = go.Figure()
+# fig0.add_trace(go.Pie(values= df_vacinas["Total Doses Aplicadas"], labels=df_vacinas["Dose"],hole=.3,marker=dict(colors=colors)))
+# fig0.update_layout(
+#     title_text='<b>Vacinomêtro',
+#     font=dict(family='Gill Sans, sans-serif',size=12,color='#1f1b18'),
+#     title_x = 0.5,
+#     autosize=True,
+#     margin = dict(l=100, r=50, t=80, b=70),
+# )
 
 # Grafico linha casos
 fig1 = go.Figure()
@@ -106,6 +120,21 @@ fig4.update_layout(
     title_x = 0.5,
     autosize=True,
     margin = dict(l=90, r=50, t=80, b=70))
+
+fig6 = go.Figure()
+fig6.add_trace(go.Scatter(x=df_tratado["datahora"], y=df_tratado["casos_novos"], fill='tozeroy',line=dict(color='#db261f')))
+fig6.update_layout(
+    yaxis=dict(ticks="outside",gridcolor='#f1f1f1',showline=True,showticklabels=True,linewidth=2,linecolor='rgb(204, 204, 204)'),
+    xaxis=dict(gridcolor='#f1f1f1',showline=True,showticklabels=True,linewidth=2,linecolor='rgb(204, 204, 204)'),
+    title='<b>Letalidade por Período',
+    font=dict(family='Gill Sans, sans-serif',size=12,color='#1f1b18'),
+    xaxis_title='Data',
+    yaxis_title='Letalidade (%)',
+    plot_bgcolor='white',
+    title_x = 0.5,
+    autosize=True,
+    margin = dict(l=100, r=50, t=80, b=70),
+)
 
 # ==================================================================
 # Layout
@@ -484,66 +513,7 @@ app.layout = dbc.Container([
             ], color="#201b17",className='cards',style={"margin-right": "5px"})
         ], md=3)
     ], style={"border-bottom": "10px solid #f1f1f1", "background-image": "linear-gradient(#1f1b18 50%, #f1f1f1 50%)"})
-    , dbc.Row([
-        dbc.Col([
-                dbc.Card([
-                    dbc.CardBody([
-                         dcc.Dropdown(
-                                id='demo-dropdown',className="demo-dropdown",
-                                options=[{"label": i, "value": i} for i in list_municipios
-                                         ],
-                                value=list_tabela,
-                                multi=True
-                            ),
-                            # Tabela
-                            dt.DataTable(
-                                id='table',
-                                data=df_tratado_rename.to_dict('records'),
-                                columns=[{"name": i, "id": i} for i in sorted(df_tratado_rename.columns)],
-                                style_cell=dict(textAlign='right',style={"color": "black","font-weight": "bold",'font-family': 'Gill Sans, sans-serif',"padding-top":"10px",
-                                'minWidth': 95, 'width': 90, 'maxWidth': 95,'height': 200}),
-                                editable=False,
-                                sort_action="native",
-                                sort_mode="single",
-                                row_deletable=False,
-                                selected_columns=[],
-                                selected_rows=[],
-                                page_action="native",
-                                page_current=0,
-                                page_size=7,
-                                style_header={"color": "#f1f1f1","background-color":"#1f1b18",'font-family': 'Gill Sans, sans-serif',"font-weight": "bold"},
-                                style_data={"color": "#3B332D",'font-family': 'Gill Sans, sans-serif','border': '1px solid grey'},
-
-
-                            tooltip_conditional=[
-                                    {
-                                        'if': {
-                                            'filter_query': '{Município} contains "SÃO PAULO"'
-                                        },
-                                        'type': 'markdown',
-                                        'value': 'Uma das 10 maiores cidades do estado de São Paulo.'
-                                    }
-                                ],
-
-                                style_data_conditional=[
-                                    {
-                                        'if': {
-                                            'filter_query': '{Município} contains "SÃO PAULO"'
-                                        },
-
-                                        'backgroundColor': '#db261f',
-                                        'color': 'white',
-                                        'textDecoration': 'underline',
-                                        'textDecorationStyle': 'dotted',
-                                    }
-                                ],
-                                tooltip_delay=0,
-                                tooltip_duration=None
-                            )
-                        ])
-                    ],className='card-tabela')
-            ])
-        ])
+    # Graficos
     ,dbc.Row([
         dbc.Col([
             dcc.Markdown(['''>
@@ -598,8 +568,74 @@ app.layout = dbc.Container([
     ])
     ,dbc.Row([
         dbc.Col([
+            dcc.Graph(id="letalidade-graph",className = 'graph1',)
+        ],md=6)
+        ,dbc.Col([
+            dcc.Graph(id="mortes-graph",className = 'graph2')
+        ],md=6)
+    ])
+    # Tabela
+    , dbc.Row([
+        dbc.Col([
+            dcc.Markdown(['''>
+    > Tabela de Visualização
+    >'''], className="lb_imunizados", style={'margin-top': '40px', 'margin-left': '10px'})
+        ])
+    ])
+    , dbc.Row([
+        dbc.Col([
+                dbc.Card([
+                    dbc.CardBody([
+                         dcc.Dropdown(
+                                id='demo-dropdown',className="demo-dropdown",
+                                options=[{"label": i, "value": i} for i in list_municipios
+                                         ],
+                                value=list_tabela,
+                                placeholder="Escolha um município",
+                                multi=True
+                            ),
+                            # Tabela
+                            dt.DataTable(
+                                id='table',
+                                data=df_tratado_rename.to_dict('records'),
+                                columns=[{"name": i, "id": i} for i in sorted(df_tratado_rename.columns)],
+                                style_cell=dict(textAlign='right',style={"color": "black","font-weight": "bold",'font-family': 'Gill Sans, sans-serif',"padding-top":"10px",
+                                'minWidth': 95, 'width': 95, 'maxWidth': 95,'height': 200}),
+                                editable=False,
+                                sort_action="native",
+                                sort_mode="single",
+                                row_deletable=False,
+                                selected_columns=[],
+                                selected_rows=[],
+                                page_current=0,
+                                page_action="native",
+                                fixed_rows={'headers': True},
+                                style_table={'overflowY': 'auto','height': '245px'},
+                                style_header={"color": "#f1f1f1","background-color":"#1f1b18",'font-family': 'Gill Sans, sans-serif',"font-weight": "bold"},
+                                style_data={"color": "#3B332D",'font-family': 'Gill Sans, sans-serif','border': '1px solid grey','whiteSpace': 'normal'},
+                                style_data_conditional=[
+                                    {
+                                        'if': {
+                                            'filter_query': '{Município} contains "SÃO PAULO"'
+                                        },
+
+                                        'backgroundColor': '#db261f',
+                                        'color': 'white',
+                                        'textDecoration': 'underline',
+                                        'textDecorationStyle': 'dotted',
+                                    }
+                                ],
+                                tooltip_delay=0,
+                                tooltip_duration=None
+                            )
+                        ])
+                    ],className='card-tabela')
+            ])
+        ])
+    ,dbc.Row([
+        dbc.Col([
             html.Div([
-                html.H6("Painel de COVID-19 do Estado de São Paulo | ©Fluffy2021",style={"color":"#1f1b18","margin-top":"20px",'text-align': 'center'}),
+                html.H6("Painel de COVID-19 do Estado de São Paulo | ©Fluffy2021",style={"color":"#1f1b18","margin-top":"30px",'text-align': 'center'}),
                 dcc.Link(children=html.Img(id="github-button", src="assets/github-button.png", width=25, style={"margin-top": "5px","margin-bottom":"20px",'display': 'block','margin-left': 'auto','margin-right': 'auto'}),href='https://github.com/fluffyfatec/SPanel/blob/main/Sprint_3/interface2.py',
                          refresh=True)
             ])
@@ -723,7 +759,7 @@ def display_vacinas(location):
         df_data_vacinas = df_vacinas[df_vacinas["Município"] == location]
 
     # update grafico
-    fig0.update_traces(go.Pie(values= df_data_vacinas["Total Doses Aplicadas"],labels=df_data_vacinas["Dose"]))
+    fig0.update_traces(go.Bar(x=df_data_vacinas["Total Doses Aplicadas"], y=df_data_vacinas["Dose"],text=df_data_vacinas["Total Doses Aplicadas"],marker_color='#db261f'))
     return (
         fig0
     )
@@ -735,7 +771,8 @@ def display_vacinas(location):
     Output("casos-graph","figure"),
     Output("casosnovos-graph","figure"),
     Output("obitos-graph","figure"),
-    Output("obitosnovos-graph","figure")
+    Output("obitosnovos-graph","figure"),
+    Output("letalidade-graph","figure")
     ],
     [
     Input("location-dropdown", "value"),
@@ -747,19 +784,26 @@ def display_graph(location, start_date, end_date):
     if not location:
         df_data_on_location = df_estadotratado[(df_estadotratado['datahora'] >= start_date) & (df_estadotratado['datahora'] <= end_date)]
         df_data_on_acumulado = df_estadotratado[(df_estadotratado['datahora'] >= '2020-01-01') & (df_estadotratado['datahora'] <= end_date)]
+        df_data_on_acumulado = df_data_on_acumulado.assign(letalidade=df_data_on_acumulado['obitos'] / df_data_on_acumulado['casos'] * 100)
+        decimals = 2
+        df_data_on_acumulado['letalidade'] = df_data_on_acumulado['letalidade'].apply(lambda x: round(x, decimals))
     else:
         df_data_on_location = df_tratado[df_tratado["nome_munic"] == location]
         df_data_on_location = df_data_on_location[(df_data_on_location['datahora'] >= start_date) & (df_data_on_location['datahora'] <= end_date)]
         df_data_on_acumulado = df_tratado[df_tratado["nome_munic"] == location]
         df_data_on_acumulado = df_data_on_acumulado[(df_data_on_acumulado['datahora'] >= '2020-01-01') & (df_data_on_acumulado['datahora'] <= end_date)]
+        df_data_on_acumulado = df_data_on_acumulado.assign(letalidade=df_data_on_acumulado['obitos'] / df_data_on_acumulado['casos'] * 100)
+        decimals = 2
+        df_data_on_acumulado['letalidade'] = df_data_on_acumulado['letalidade'].apply(lambda x: round(x, decimals))
 
     # update graficos
     fig1.update_traces(go.Scatter(x=df_data_on_acumulado["datahora"], y=df_data_on_acumulado["casos"]))
     fig2.update_traces(go.Bar(x=df_data_on_location["datahora"], y=df_data_on_location["casos_novos"],text=df_data_on_location["casos_novos"]))
     fig3.update_traces(go.Scatter(x=df_data_on_acumulado["datahora"], y=df_data_on_acumulado["obitos"]))
     fig4.update_traces(go.Bar(x=df_data_on_location["datahora"], y=df_data_on_location["obitos_novos"],text=df_data_on_location["obitos_novos"]))
+    fig6.update_traces(go.Scatter(x=df_data_on_acumulado["datahora"], y=df_data_on_acumulado["letalidade"]))
     return (
-        fig1, fig2, fig3, fig4
+        fig1, fig2, fig3, fig4, fig6
     )
 
 
