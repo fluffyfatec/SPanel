@@ -65,23 +65,36 @@ fig0.update_layout(
     plot_bgcolor='white',
     title_x = 0.5,
     autosize=True,
-    margin = dict(l=120, r=50, t=80, b=70))
+    margin = dict(l=50, r=30, t=40, b=90))
 
 # Grafico pizza imunizados
-# colors = ['#BDBDBD','#757575','#db261f','#1f1b18']
-# fig0 = go.Figure()
-# fig0.add_trace(go.Pie(values= df_vacinas["Total Doses Aplicadas"], labels=df_vacinas["Dose"],hole=.3,marker=dict(colors=colors)))
-# fig0.update_layout(
-#     title_text='<b>Vacinomêtro',
-#     font=dict(family='Gill Sans, sans-serif',size=12,color='#1f1b18'),
-#     title_x = 0.5,
-#     autosize=True,
-#     margin = dict(l=100, r=50, t=80, b=70),
-# )
+df_data_imunizados = df_vacinastratado[df_vacinastratado["nome_munic"] == location]
+df_data_imunizados = df_data_imunizados.assign(Imunizados=df_data_imunizados['doseunica'] + df_data_imunizados['segundadose'])
+
+df_data_nao_imunizados = df_data_imunizados.assign(Nao_Imunizados=df_data_imunizados['pop'] - df_data_imunizados["Imunizados"])
+
+df_data_nao_imunizados = df_data_nao_imunizados.drop(columns=['doseunica','primeiradose','segundadose','terceiradose','pop'])
+
+
+df_data_imunizados = df_data_nao_imunizados['nome_munic'],df_data_nao_imunizados['Imunizados']
+df_data_nao_imunizados = df_data_nao_imunizados['nome_munic'],df_data_nao_imunizados['Nao_Imunizados']
+
+df_teste = df_data_imunizados,df_data_nao_imunizados
+
+colors = ['#BDBDBD','#757575','#db261f','#1f1b18']
+fig0 = go.Figure()
+fig0.add_trace(go.Pie(values= df_teste["Total Doses Aplicadas"], labels=df_vacinas["Dose"],hole=.3,marker=dict(colors=colors)))
+fig0.update_layout(
+    title_text='<b>Vacinomêtro',
+    font=dict(family='Gill Sans, sans-serif',size=12,color='#1f1b18'),
+    title_x = 0.5,
+    autosize=True,
+    margin = dict(l=100, r=50, t=80, b=70),
+)
 
 # Grafico linha casos
 fig1 = go.Figure()
-fig1.add_trace(go.Scatter(x=df_estadotratado["datahora"], y=df_estadotratado["casos"],fill='tozeroy',line=dict(color='#db261f')))
+fig1.add_trace(go.Scatter(x=df_estadotratado["datahora"], y=df_estadotratado["casos"],fill='tozeroy',line_shape='spline',line=dict(color='#db261f',width=2)))
 fig1.update_layout(
     yaxis=dict(ticks="outside",gridcolor='#f1f1f1',showline=True,showticklabels=True,linewidth=2,linecolor='rgb(204, 204, 204)'),
     xaxis=dict(gridcolor='#f1f1f1',showline=True,showticklabels=True,linewidth=2,linecolor='rgb(204, 204, 204)'),
@@ -92,7 +105,7 @@ fig1.update_layout(
     plot_bgcolor='white',
     title_x = 0.5,
     autosize=True,
-    margin = dict(l=100, r=50, t=80, b=70),
+    margin = dict(l=50, r=30, t=40, b=80),
 )
 
 # Grafico bar casos novos
@@ -108,11 +121,11 @@ fig2.update_layout(
     plot_bgcolor='white',
     title_x = 0.5,
     autosize=True,
-    margin = dict(l=90, r=50, t=80, b=70))
+    margin = dict(l=85, r=20, t=40, b=80))
 
 # Grafico linhas obitos
 fig3 = go.Figure()
-fig3.add_trace(go.Scatter(x=df_estadotratado["datahora"], y=df_estadotratado["obitos"],fill='tozeroy',line=dict(color='#db261f')))
+fig3.add_trace(go.Scatter(x=df_estadotratado["datahora"], y=df_estadotratado["obitos"],fill='tozeroy',line_shape='spline',line=dict(color='#db261f',width=2)))
 fig3.update_layout(
     yaxis=dict(ticks="outside",gridcolor='#f1f1f1',showline=True,showticklabels=True,linewidth=2,linecolor='rgb(204, 204, 204)'),
     xaxis=dict(gridcolor='#f1f1f1',showline=True,showticklabels=True,linewidth=2,linecolor='rgb(204, 204, 204)'),
@@ -123,7 +136,7 @@ fig3.update_layout(
     plot_bgcolor='white',
     title_x = 0.5,
     autosize=True,
-    margin = dict(l=100, r=50, t=80, b=70),
+    margin = dict(l=50, r=30, t=40, b=80),
 )
 
 # Grafico bar obitos novos
@@ -139,11 +152,12 @@ fig4.update_layout(
     plot_bgcolor='white',
     title_x = 0.5,
     autosize=True,
-    margin = dict(l=90, r=50, t=80, b=70))
+    margin = dict(l=85, r=20, t=40, b=80),
+    showlegend=False)
 
 # Grafico de linha letalidade
 fig6 = go.Figure()
-fig6.add_trace(go.Scatter(x=df_tratado["datahora"], y=df_tratado["casos_novos"], fill='tozeroy',line=dict(color='#db261f')))
+fig6.add_trace(go.Scatter(x=df_tratado["datahora"], y=df_tratado["casos_novos"], fill='tozeroy',line_shape='spline',line=dict(color='#db261f',width=2)))
 fig6.update_layout(
     yaxis=dict(ticks="outside",gridcolor='#f1f1f1',showline=True,showticklabels=True,linewidth=2,linecolor='rgb(204, 204, 204)'),
     xaxis=dict(gridcolor='#f1f1f1',showline=True,showticklabels=True,linewidth=2,linecolor='rgb(204, 204, 204)'),
@@ -154,7 +168,8 @@ fig6.update_layout(
     plot_bgcolor='white',
     title_x = 0.5,
     autosize=True,
-    margin = dict(l=100, r=50, t=80, b=70),
+    margin = dict(l=50, r=30, t=40, b=80),
+    showlegend=False
 )
 
 # ==================================================================
@@ -418,10 +433,10 @@ app.layout = dbc.Spinner(dbc.Container([
                             html.H6("% Imunizados", style={"color": "#f1f1f1", "font-weight": "bold"}),
                             html.H2(style={"color": "#f1f1f1"},
                             id="porcentagemimunizados-text")
-                        ],md=5,style={'margin-bottom':'5px'})
+                        ],md=5)
                     ])
                 ])
-            ], color="#db261f",className='cards',style={"margin-left": "5px"})
+            ],className='cardsteste',style={"margin-left": "5px"})
         ], md=3),
         # Coluna 2 - Casos
         dbc.Col([
@@ -531,9 +546,9 @@ app.layout = dbc.Spinner(dbc.Container([
                         ],md=12)
                     ])
                 ])
-            ], color="#201b17",className='cards',style={"margin-right": "5px"})
+            ],className='cardsteste2',style={"margin-right": "5px"})
         ], md=3)
-    ], style={"border-bottom": "10px solid #f1f1f1", "background-image": "linear-gradient(#1f1b18 50%, #f1f1f1 50%)"})
+    ], style={"background-image": "linear-gradient(#1f1b18 50%, #f1f1f1 50%)"})
     # Graficos
     ,dbc.Row([
         dbc.Col([
@@ -544,10 +559,18 @@ app.layout = dbc.Spinner(dbc.Container([
     ])
     ,dbc.Row([
         dbc.Col([
-            dcc.Graph(id="vacinas-graph",className = 'graph1')
+            dbc.Card([
+                dbc.CardBody([
+                    dcc.Graph(id="vacinas-graph",className = 'graph1')
+                ])
+            ],className="cardgraph")
         ], md=6)
-        , dbc.Col([
-            dcc.Graph(id="vacinas-graph2",className = 'graph2')
+        ,dbc.Col([
+            dbc.Card([
+                dbc.CardBody([
+                    dcc.Graph(id="vacinas-graph2", className='graph2')
+                ])
+            ],className="cardgraph2")
         ], md=6)
     ])
     ,dbc.Row([
@@ -557,13 +580,21 @@ app.layout = dbc.Spinner(dbc.Container([
             >'''],className="lb_imunizados",style={'margin-top':'40px','margin-left':'10px'})
         ])
     ])
-    ,dbc.Row([
+    , dbc.Row([
         dbc.Col([
-            dcc.Graph(id="casos-graph",className = 'graph1',)
-        ],md=6)
-        ,dbc.Col([
-            dcc.Graph(id="casosnovos-graph",className = 'graph2')
-        ],md=6)
+            dbc.Card([
+                dbc.CardBody([
+                    dcc.Graph(id="casos-graph", className='graph1')
+                ])
+            ],className="cardgraph")
+        ], md=6)
+        , dbc.Col([
+            dbc.Card([
+                dbc.CardBody([
+                    dcc.Graph(id="casosnovos-graph", className='graph2')
+                ])
+            ],className="cardgraph2")
+        ], md=6)
     ])
     ,dbc.Row([
         dbc.Col([
@@ -572,13 +603,21 @@ app.layout = dbc.Spinner(dbc.Container([
         >'''], className="lb_imunizados",style={'margin-top':'40px','margin-left':'10px'})
         ])
     ])
-    ,dbc.Row([
+    , dbc.Row([
         dbc.Col([
-            dcc.Graph(id="obitos-graph",className = 'graph1',)
-        ],md=6)
-        ,dbc.Col([
-            dcc.Graph(id="obitosnovos-graph",className = 'graph2')
-        ],md=6)
+            dbc.Card([
+                dbc.CardBody([
+                    dcc.Graph(id="obitos-graph", className='graph1')
+                ])
+            ],className="cardgraph")
+        ], md=6)
+        , dbc.Col([
+            dbc.Card([
+                dbc.CardBody([
+                    dcc.Graph(id="obitosnovos-graph", className='graph2')
+                ])
+            ],className="cardgraph2")
+        ], md=6)
     ])
     ,dbc.Row([
         dbc.Col([
@@ -587,13 +626,21 @@ app.layout = dbc.Spinner(dbc.Container([
         >'''], className="lb_imunizados",style={'margin-top':'40px','margin-left':'10px'})
         ])
     ])
-    ,dbc.Row([
+    , dbc.Row([
         dbc.Col([
-            dcc.Graph(id="letalidade-graph",className = 'graph1',)
-        ],md=6)
-        ,dbc.Col([
-            dcc.Graph(id="mortes-graph",className = 'graph2')
-        ],md=6)
+            dbc.Card([
+                dbc.CardBody([
+                    dcc.Graph(id="letalidade-graph", className='graph1')
+                ])
+            ],className="cardgraph")
+        ], md=6)
+        , dbc.Col([
+            dbc.Card([
+                dbc.CardBody([
+                    dcc.Graph(id="mortes-graph2", className='graph2')
+                ])
+            ],className="cardgraph2")
+        ], md=6)
     ])
     # Tabela
     , dbc.Row([
@@ -616,37 +663,107 @@ app.layout = dbc.Spinner(dbc.Container([
                                 clearable=True,
                                 multi=True
                             ),
-                            # Tabela
-                            dt.DataTable(
-                                id='table',
-                                data=df_tratado_rename.to_dict('records'),
-                                columns=[{"name": i, "id": i} for i in (df_tratado_rename.columns)],
-                                style_cell=dict(textAlign='right',style={"color": "black","font-weight": "bold",'font-family': 'Gill Sans, sans-serif',"padding-top":"10px",
-                                'minWidth': 95, 'width': 95, 'maxWidth': 95,'height': 200}),
-                                editable=False,
-                                sort_action="native",
-                                sort_mode="single",
-                                row_deletable=False,
-                                selected_columns=[],
-                                selected_rows=[],
-                                page_current=0,
-                                page_action="native",
-                                fixed_rows={'headers': True,'data': 1},
-                                style_table={'overflowY': 'auto','height': '245px'},
-                                style_header={"color": "#f1f1f1","background-color":"#1f1b18",'font-family': 'Gill Sans, sans-serif',"font-weight": "bold"},
-                                style_data={"color": "#3B332D",'font-family': 'Gill Sans, sans-serif','border': '1px solid grey','whiteSpace': 'normal'},
-                                style_data_conditional=[
-                                    {
-                                        'if': {
-                                            'filter_query': '{Localização} contains "ESTADO DE SÃO PAULO"'
-                                        },
-                                        'backgroundColor': '#db261f',
-                                        'color': 'white',
-                                    }
-                                ],
-                                tooltip_delay=0,
-                                tooltip_duration=None
-                            )
+                        # Tabela
+                        dt.DataTable(
+                            id='table',
+                            data=df_tratado_rename.to_dict('records'),
+                            columns=[{"name": i, "id": i} for i in (df_tratado_rename.columns)],
+                            style_table={'overflowY': 'auto', 'height': '300px'},
+                            style_cell={'minWidth': '95px', 'width': '180px', 'maxWidth': '180px', 'whiteSpace': 'auto',
+                                        'height': 'auto'},
+                            editable=False,
+                            sort_action="native",
+                            sort_mode="single",
+                            row_deletable=False,
+                            selected_columns=[],
+                            selected_rows=[],
+                            page_current=0,
+                            page_action="native",
+                            fixed_rows={'headers': True},
+                            style_header={"color": "#f1f1f1", "background-color": "#1f1b18",
+                                          'font-family': 'Gill Sans, sans-serif', "font-weight": "bold"},
+                            style_data={"color": "#3B332D", 'font-family': 'Gill Sans, sans-serif',
+                                        'border': '1px solid grey', 'whiteSpace': 'normal'},
+                            style_data_conditional=[
+                                                       {
+                                                           'if': {
+                                                               'filter_query': '{{Casos Acumulados}} = {}'.format(
+                                                                   df_tratado_rename['Casos Acumulados'].max()),
+                                                               'column_id': 'Casos Acumulados',
+
+                                                           },
+                                                           'backgroundColor': '#E68B8B',
+                                                           'color': 'white'
+                                                       },
+
+                                                   ] +
+                                                   [
+                                                       {
+                                                           'if': {
+                                                               'filter_query': '{{Óbitos Acumulados}} = {}'.format(
+                                                                   df_tratado_rename['Óbitos Acumulados'].max()),
+                                                               'column_id': 'Óbitos Acumulados',
+                                                           },
+                                                           'backgroundColor': '#E68B8B',
+                                                           'color': 'white'
+                                                       },
+                                                   ] +
+                                                   [
+                                                       {
+                                                           'if': {
+                                                               'filter_query': '{{Dose Unica}} = {}'.format(
+                                                                   df_tratado_rename['Dose Unica'].max()),
+                                                               'column_id': 'Dose Unica',
+                                                           },
+                                                           'backgroundColor': '#E68B8B',
+                                                           'color': 'white'
+                                                       },
+                                                   ] +
+                                                   [
+                                                       {
+                                                           'if': {
+                                                               'filter_query': '{{Primeira Dose}} = {}'.format(
+                                                                   df_tratado_rename['Primeira Dose'].max()),
+                                                               'column_id': 'Primeira Dose',
+                                                           },
+                                                           'backgroundColor': '#E68B8B',
+                                                           'color': 'white'
+                                                       },
+                                                   ] +
+                                                   [
+                                                       {
+                                                           'if': {
+                                                               'filter_query': '{{Segunda Dose}} = {}'.format(
+                                                                   df_tratado_rename['Segunda Dose'].max()),
+                                                               'column_id': 'Segunda Dose',
+                                                           },
+                                                           'backgroundColor': '#E68B8B',
+                                                           'color': 'white'
+                                                       },
+                                                   ] +
+                                                   [
+                                                       {
+                                                           'if': {
+                                                               'filter_query': '{{Terceira Dose}} = {}'.format(
+                                                                   df_tratado_rename['Terceira Dose'].max()),
+                                                               'column_id': 'Terceira Dose',
+                                                           },
+                                                           'backgroundColor': '#E68B8B',
+                                                           'color': 'white'
+                                                       },
+                                                   ] +
+                                                   [
+                                                       {
+                                                           'if': {
+                                                               'filter_query': '{{População}} = {}'.format(
+                                                                   df_tratado_rename['População'].max()),
+                                                               'column_id': 'População',
+                                                           },
+                                                           'backgroundColor': '#E68B8B',
+                                                           'color': 'white'}
+                                                   ],
+                            tooltip_delay=0,
+                            tooltip_duration=None)
                         ])
                     ],className='card-tabela')
             ])
