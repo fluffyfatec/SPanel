@@ -23,6 +23,8 @@ df_tratado = pd.read_csv("docs/df_tratado.csv")
 df_vacinastratado = pd.read_csv("docs/df_vacinastratado.csv")
 df_estadotratado = pd.read_csv("docs/df_estadotratado.csv")
 df_vacinas = pd.read_csv("docs/vacinas.csv", sep=';')
+df_vacinas = df_vacinas.rename(
+    columns={'Município':'nome_munic'})
 list_municipios = sorted(df_tratado['nome_munic'].unique()) #formatação de municipios
 date_column = df_tratado["datahora"]
 max = date_column.max()
@@ -66,6 +68,15 @@ fig0.update_layout(
     title_x = 0.5,
     autosize=True,
     margin = dict(l=50, r=30, t=40, b=90))
+
+fig5 = go.Figure()
+fig5.update_layout(
+    title_text='<b>Vacinomêtro\b',
+    font=dict(family='Gill Sans, sans-serif',size=12,color='#1f1b18'),
+    title_x = 0.5,
+    autosize=True,
+    margin = dict(l=100, r=50, t=80, b=70),
+)
 
 # Grafico pizza imunizados
 # colors = ['#BDBDBD','#757575','#db261f','#1f1b18']
@@ -886,15 +897,66 @@ def display_vacinas(location):
         df_data_vacinas = df_data_vacinas.append(dict(zip(df_vacinas.columns, ['Estado', '3º DOSE', soma_terceira])),ignore_index=True)
         df_data_vacinas = df_data_vacinas.append(dict(zip(df_vacinas.columns, ['Estado', '2º DOSE', soma_segunda])),ignore_index=True)
         df_data_vacinas = df_data_vacinas.append(dict(zip(df_vacinas.columns, ['Estado', '1º DOSE', soma_primeira])),ignore_index=True)
-        df_data_vacinas = df_data_vacinas.query('Município=="Estado"') #alterar para dados do estado
+        df_data_vacinas = df_data_vacinas.query('nome_munic=="Estado"') #alterar para dados do estado
     else:
-        df_data_vacinas = df_vacinas[df_vacinas["Município"] == location]
+        df_data_vacinas = df_vacinas[df_vacinas["nome_munic"] == location]
 
     # update grafico
     fig0.update_traces(go.Bar(x=df_data_vacinas["Total Doses Aplicadas"], y=df_data_vacinas["Dose"],text=df_data_vacinas["Total Doses Aplicadas"],marker_color='#db261f'))
     return (
         fig0
     )
+@app.callback(
+    Output("vacinas-graph2", "figure"),
+    [
+    Input("location-dropdown", "value")
+    ]
+)
+def display_imunizados(location):
+    df_vacinastratado = pd.read_csv('docs/df_vacinastratado.csv')
+    if not location:
+        df_data_imunizados1 = df_vacinastratado["segundadose"].sum()
+        df_data_imunizados2 = df_vacinastratado["doseunica"].sum()
+        df_data_imunizados3 = (df_data_imunizados2 + df_data_imunizados1)
+        df_nao_imunizados2 = (44639899 - df_data_imunizados3)
+        labels = ['Imunizados','Não Imunizados']
+        values = [(df_data_imunizados3), (df_nao_imunizados2)]
+    else:
+        df_vacinastratado = df_vacinastratado[df_vacinastratado['nome_munic'] == location]
+        pop = df_vacinastratado.iloc[0]['pop']
+
+        df_data_imunizados = df_vacinas[df_vacinas["nome_munic"] == location]
+        df_data_imunizados.loc[-1] = [location, 'pop', pop]
+        df_data_imunizados = df_data_imunizados.sort_index()
+        df_data_imunizados.index = df_data_imunizados.index + 1
+
+        df_data_imunizadosunica = df_data_imunizados[df_data_imunizados['Dose'] == 'UNICA']
+        df_data_imunizadosunica = df_data_imunizadosunica.iloc[0]['Total Doses Aplicadas']
+
+        df_data_imunizados2 = df_data_imunizados[df_data_imunizados['Dose'] == '2° DOSE']
+        df_data_imunizados2 = df_data_imunizados2.iloc[0]['Total Doses Aplicadas']
+
+        df_data_imunizadostotal = df_data_imunizados2 + df_data_imunizadosunica
+        df_data_imunizados.loc[-1] = [location, 'Imunizados', df_data_imunizadostotal]
+        df_data_imunizados = df_data_imunizados.sort_index()
+        df_data_imunizados.index = df_data_imunizados.index + 1
+
+        df_data_naoimunizados = df_data_imunizados[df_data_imunizados['Dose'] == 'pop']
+        df_data_naoimunizados = df_data_naoimunizados.iloc[0]['Total Doses Aplicadas']
+
+        df_data_naoimunizados = df_data_naoimunizados - df_data_imunizadostotal
+        df_data_imunizados.loc[-1] = [location, 'Não Imunizados', df_data_naoimunizados]
+        df_data_imunizados = df_data_imunizados.sort_index()
+        df_data_imunizados.index = df_data_imunizados.index + 1
+        df_data_imunizados = df_data_imunizados.query("Dose == 'Imunizados' | Dose == 'Não Imunizados'")
+        values = df_data_imunizados['Total Doses Aplicadas']
+        labels = df_data_imunizados['Dose']
+    fig5.add_trace(go.Pie(values=values, labels=labels))
+    fig5.update_traces(go.Pie(values=values, labels=labels))
+    return(
+        fig5
+)
+
 
 # ==================================================================
 # Grafico Card 2 e 3
