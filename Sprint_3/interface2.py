@@ -73,7 +73,7 @@ fig0.update_layout(
 #Grafico pizza imunizados
 colors = ['#1f1b18','#db261f']
 fig5 = go.Figure()
-fig5.add_trace(go.Pie(values= df_vacinas["Total Doses Aplicadas"], labels=df_vacinas["Dose"],hole=.3,marker=dict(colors=colors)))
+fig5.add_trace(go.Pie(values= df_vacinas["Total Doses Aplicadas"], labels=df_vacinas["Dose"],pull=[0, 0.05],hole=.3,marker=dict(colors=colors)))
 fig5.update_layout(
     title_text='<b>Vacinômetro',
     font=dict(family='Gill Sans, sans-serif',size=12,color='#1f1b18'),
@@ -165,7 +165,7 @@ fig6.update_layout(
 # ==================================================================
 # Layout
 app = dash.Dash(__name__, external_stylesheets=[dbc.themes.SANDSTONE],title='SPanel | COVID-19',update_title="Iniciando...")
-app.layout = dbc.Spinner(dbc.Container([
+app.layout = dbc.Container([
     # Linha 1 - Cabeçario
     dbc.Row([
         # Dados e logotipo
@@ -775,7 +775,7 @@ app.layout = dbc.Spinner(dbc.Container([
             ])
         ])
     ],style={"justify-content": "center"})
-], fluid=True,style={"background-color": "#f1f1f1"}),fullscreen=True,show_initially=True,spinnerClassName="spinner",type=None)
+], fluid=True,style={"background-color": "#f1f1f1"})
 
 # ==================================================================
 # Interatividade
