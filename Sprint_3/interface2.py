@@ -16,6 +16,7 @@ import dash_table as dt
 # ==================================================================
 # Bibliotecas de manipulação de dados
 import pandas as pd
+pd.options.mode.chained_assignment = None
 
 # ==================================================================
 # Pré processamentos
@@ -23,6 +24,8 @@ df_tratado = pd.read_csv("docs/df_tratado.csv")
 df_vacinastratado = pd.read_csv("docs/df_vacinastratado.csv")
 df_estadotratado = pd.read_csv("docs/df_estadotratado.csv")
 df_vacinas = pd.read_csv("docs/vacinas.csv", sep=';')
+df_vacinas = df_vacinas.rename(
+    columns={'Município': 'nome_munic'})
 list_municipios = sorted(df_tratado['nome_munic'].unique()) #formatação de municipios
 date_column = df_tratado["datahora"]
 max = date_column.max()
@@ -67,29 +70,16 @@ fig0.update_layout(
     autosize=True,
     margin = dict(l=50, r=30, t=40, b=90))
 
-# Grafico pizza imunizados
-df_data_imunizados = df_vacinastratado[df_vacinastratado["nome_munic"] == location]
-df_data_imunizados = df_data_imunizados.assign(Imunizados=df_data_imunizados['doseunica'] + df_data_imunizados['segundadose'])
-
-df_data_nao_imunizados = df_data_imunizados.assign(Nao_Imunizados=df_data_imunizados['pop'] - df_data_imunizados["Imunizados"])
-
-df_data_nao_imunizados = df_data_nao_imunizados.drop(columns=['doseunica','primeiradose','segundadose','terceiradose','pop'])
-
-
-df_data_imunizados = df_data_nao_imunizados['nome_munic'],df_data_nao_imunizados['Imunizados']
-df_data_nao_imunizados = df_data_nao_imunizados['nome_munic'],df_data_nao_imunizados['Nao_Imunizados']
-
-df_teste = df_data_imunizados,df_data_nao_imunizados
-
-colors = ['#BDBDBD','#757575','#db261f','#1f1b18']
-fig0 = go.Figure()
-fig0.add_trace(go.Pie(values= df_teste["Total Doses Aplicadas"], labels=df_vacinas["Dose"],hole=.3,marker=dict(colors=colors)))
-fig0.update_layout(
-    title_text='<b>Vacinomêtro',
+#Grafico pizza imunizados
+colors = ['#1f1b18','#db261f']
+fig5 = go.Figure()
+fig5.add_trace(go.Pie(values= df_vacinas["Total Doses Aplicadas"], labels=df_vacinas["Dose"],hole=.3,marker=dict(colors=colors)))
+fig5.update_layout(
+    title_text='<b>Vacinômetro',
     font=dict(family='Gill Sans, sans-serif',size=12,color='#1f1b18'),
     title_x = 0.5,
     autosize=True,
-    margin = dict(l=100, r=50, t=80, b=70),
+    margin = dict(l=150, r=50, t=40, b=40),
 )
 
 # Grafico linha casos
@@ -208,8 +198,8 @@ app.layout = dbc.Spinner(dbc.Container([
                                         )
                                     ),
                                 dbc.Collapse(
-                                    dbc.CardBody(html.Div([html.B("A COVID-19 é uma doença causada pelo coronavírus, nomeado SARS-CoV-2, que apresenta um sinal clínico variando de infecções, com quadros graves e assintomáticos."),
-                                                          html.B("De acordo com a OMS (organização mundial de saúde), a maioria dos pacientes com COVID-19 podem ser assintomáticos ou apresentar poucos sintomas, em média 20% dos casos detectados necessitam de atendimento hospitalar, por causar dificuldade respiratória, dos quais 5% podem necessitar de suporte de ventilação mecânica.")
+                                    dbc.CardBody(html.Div([html.H4("A COVID-19 é uma doença causada pelo coronavírus, nomeado SARS-CoV-2, que apresenta um sinal clínico variando de infecções, com quadros graves e assintomáticos."),
+                                                          html.H4("De acordo com a OMS (organização mundial de saúde), a maioria dos pacientes com COVID-19 podem ser assintomáticos ou apresentar poucos sintomas, em média 20% dos casos detectados necessitam de atendimento hospitalar, por causar dificuldade respiratória, dos quais 5% podem necessitar de suporte de ventilação mecânica.")
                                                           ])),
                                     id="collapse-1",
                                     is_open=False,
@@ -229,10 +219,10 @@ app.layout = dbc.Spinner(dbc.Container([
                                         )
                                     ),
                                     dbc.Collapse(
-                                        dbc.CardBody(html.Div([html.B("• A transmissão é feita por contato: ou seja, por meio do contato direto com uma pessoa infectada – exemplo: com um aperto de mão seguido do toque nos olhos, nariz ou boca, ou com objetos e superfícies contaminadas;"),
-                                                          html.B("• A transmissão por gotículas: por meio da exposição a gotículas respiratórias expelidas, contendo vírus, por uma pessoa infectada quando ela tosse ou espirra, principalmente quando ela se encontra a menos de 1 metro de distância da outra;")
-                                                          ,html.B("• A transmissão por aerossol: por meio de gotículas respiratórias menores (aerossóis) contendo vírus e que podem permanecer suspensas no ar, serem levadas por distâncias maiores que 1 metro e por períodos mais longos - geralmente horas.")
-                                                          ,html.B("A maioria das infecções se espalha por contato próximo - menos de 1 metro -, principalmente por meio de gotículas respiratórias.")
+                                        dbc.CardBody(html.Div([html.H4("• A transmissão é feita por contato: ou seja, por meio do contato direto com uma pessoa infectada – exemplo: com um aperto de mão seguido do toque nos olhos, nariz ou boca, ou com objetos e superfícies contaminadas;"),
+                                                          html.H4("• A transmissão por gotículas: por meio da exposição a gotículas respiratórias expelidas, contendo vírus, por uma pessoa infectada quando ela tosse ou espirra, principalmente quando ela se encontra a menos de 1 metro de distância da outra;")
+                                                          ,html.H4("• A transmissão por aerossol: por meio de gotículas respiratórias menores (aerossóis) contendo vírus e que podem permanecer suspensas no ar, serem levadas por distâncias maiores que 1 metro e por períodos mais longos - geralmente horas.")
+                                                          ,html.H4("A maioria das infecções se espalha por contato próximo - menos de 1 metro -, principalmente por meio de gotículas respiratórias.")
                                                           ])),
                                         id="collapse-2",
                                         is_open=False,
@@ -252,12 +242,12 @@ app.layout = dbc.Spinner(dbc.Container([
                                         )
                                     ),
                                 dbc.Collapse(
-                                    dbc.CardBody(html.Div([html.B("• Caso assintomático: mesmo com o teste laboratorial positivo para covid-19 não apresentam sintomas."),
-                                                          html.B("• Caso leve: indicado pela aparição de sintomas não específicos, como tosse, dor de garganta ou coriza, seguido, ou não, de perda de olfato e paladar, diarreia, dor abdominal, febre, calafrios, mialgia, fadiga e/ou cefaleia;")
-                                                          ,html.B("• Caso moderado: os sintomas mais presentes podem apresentar sinais leves, como tosse persistente e febre persistente diária, até sinais de piora progressiva de outro sintoma relacionado à covid-19 (fraqueza, debilidade física, falta de apetite, diarreia), além da presença de pneumonia sem sinais ou sintomas de gravidade.")
-                                                          ,html.B("• Caso grave: ou a Síndrome Respiratória Aguda Grave (Síndrome Gripal que apresente dificuldade para respirar, desconforto respiratório ou pressão persistente no peito ou saturação de oxigênio menor que 95% em ar ambiente ou coloração azulada de lábios ou rosto.")
-                                                          ,html.B("• Caso crítico: os principais sintomas são infecção, síndrome do desconforto respiratório agudo, deficiência respiratória grave, mal funcionamento de múltiplos órgãos, pneumonia grave, necessidade de suporte respiratório mecânico e internações em UTI (unidades de terapia intensiva).")
-                                                          ,html.B("• As crianças apresentam como os principais sintomas como: aceleração do ritmo respiratório, baixa saturação de oxigenação no sangue, desconforto respiratório, alteração da consciência, desidratação, dificuldade para se alimentar, coloração azulada, letargia, convulsões, recusa alimentar.")
+                                    dbc.CardBody(html.Div([html.H4("• Caso assintomático: mesmo com o teste laboratorial positivo para covid-19 não apresentam sintomas."),
+                                                          html.H4("• Caso leve: indicado pela aparição de sintomas não específicos, como tosse, dor de garganta ou coriza, seguido, ou não, de perda de olfato e paladar, diarreia, dor abdominal, febre, calafrios, mialgia, fadiga e/ou cefaleia;")
+                                                          ,html.H4("• Caso moderado: os sintomas mais presentes podem apresentar sinais leves, como tosse persistente e febre persistente diária, até sinais de piora progressiva de outro sintoma relacionado à covid-19 (fraqueza, debilidade física, falta de apetite, diarreia), além da presença de pneumonia sem sinais ou sintomas de gravidade.")
+                                                          ,html.H4("• Caso grave: ou a Síndrome Respiratória Aguda Grave (Síndrome Gripal que apresente dificuldade para respirar, desconforto respiratório ou pressão persistente no peito ou saturação de oxigênio menor que 95% em ar ambiente ou coloração azulada de lábios ou rosto.")
+                                                          ,html.H4("• Caso crítico: os principais sintomas são infecção, síndrome do desconforto respiratório agudo, deficiência respiratória grave, mal funcionamento de múltiplos órgãos, pneumonia grave, necessidade de suporte respiratório mecânico e internações em UTI (unidades de terapia intensiva).")
+                                                          ,html.H4("• As crianças apresentam como os principais sintomas como: aceleração do ritmo respiratório, baixa saturação de oxigenação no sangue, desconforto respiratório, alteração da consciência, desidratação, dificuldade para se alimentar, coloração azulada, letargia, convulsões, recusa alimentar.")
                                                           ])),
                                     id="collapse-3",
                                     is_open=False,
@@ -277,8 +267,8 @@ app.layout = dbc.Spinner(dbc.Container([
                                         )
                                     ),
                                 dbc.Collapse(
-                                    dbc.CardBody(html.Div([html.B("As medidas indicadas, estão as não farmacológicas (conjunto de intervenções que visam maximizar o funcionamento cognitivo e o bem-estar da pessoa, bem como ajudá-la no processo de adaptação à doença), como distanciamento social, etiqueta respiratória e de higienização das mãos, uso de máscaras, limpeza e desinfeção de ambientes, isolamento de casos suspeitos e confirmados e quarentena dos contatos dos casos de covid-19, conforme orientações médicas."),
-                                                          html.B("Também é recomendada a vacinação contra a covid-19 dos grupos prioritários conforme o Plano Nacional de Operacionalização da Vacinação.")
+                                    dbc.CardBody(html.Div([html.H4("As medidas indicadas, estão as não farmacológicas (conjunto de intervenções que visam maximizar o funcionamento cognitivo e o bem-estar da pessoa, bem como ajudá-la no processo de adaptação à doença), como distanciamento social, etiqueta respiratória e de higienização das mãos, uso de máscaras, limpeza e desinfeção de ambientes, isolamento de casos suspeitos e confirmados e quarentena dos contatos dos casos de covid-19, conforme orientações médicas."),
+                                                          html.H4("Também é recomendada a vacinação contra a covid-19 dos grupos prioritários conforme o Plano Nacional de Operacionalização da Vacinação.")
                                                           ])),
                                     id="collapse-4",
                                     is_open=False,
@@ -307,40 +297,40 @@ app.layout = dbc.Spinner(dbc.Container([
                         dbc.ModalBody([
                             html.Div([
                                 html.H6("Introdução",style={"color":"#1f1b18","font-weight": "bold"}),
-                                html.B("O SPanel foi desenvolvido para a visualização ágil e simplificada dos dados do COVID-19 no Estado de São Paulo e seus respectivos Municípios.",style={"color":"#3B332D"}),
+                                html.H4("O SPanel foi desenvolvido para a visualização ágil e simplificada dos dados do COVID-19 no Estado de São Paulo e seus respectivos Municípios.",style={"color":"#3B332D"}),
 
                                 html.H6("Limitações",style={"color":"#1f1b18","font-weight": "bold","padding-top":"10px"}),
-                                html.B("Levando em consideração a pluralidade em relação a infraestrutura ao estado e municípios, "
+                                html.H4("Levando em consideração a pluralidade em relação a infraestrutura ao estado e municípios, "
                                         "poderá haver mudanças aos números em decorrência de erros ou atrasos ao repasse de informações.",style={"color":"#3B332D"}),
 
                                 html.H5("Conceitos básicos:",style={"color":"#1f1b18","font-weight": "bold","padding-top":"10px"}),
                                 html.H6("Imunizados",style={"color":"#1f1b18","font-weight": "bold"}),
-                                html.B("O número de imunizados, é feito pela soma da população que já efetuou a vacinação da dose "
+                                html.H4("O número de imunizados, é feito pela soma da população que já efetuou a vacinação da dose "
                                         "única e da segunda dose das vacinas disponibilizadas pelo Governo do Estado de São Paulo.",style={"color":"#3B332D"}),
 
                                 html.H6("Casos Acumulados",style={"color":"#1f1b18","font-weight": "bold","padding-top":"10px"}),
-                                html.B("O número total de casos confirmados por COVID-19, foi disponibilizado pelo Estado de São Paulo em relação ao dia anterior.",style={"color":"#3B332D"}),
+                                html.H4("O número total de casos confirmados por COVID-19, foi disponibilizado pelo Estado de São Paulo em relação ao dia anterior.",style={"color":"#3B332D"}),
 
                                 html.H6("Novos casos no período",style={"color":"#1f1b18","font-weight": "bold","padding-top":"10px"}),
-                                html.B("O número de novos casos no período por COVID-19, foi disponibilizado pelo Estado de São Paulo em relação ao dia anterior realizando a soma dos dias definidos pelo usuario.",style={"color":"#3B332D"}),
+                                html.H4("O número de novos casos no período por COVID-19, foi disponibilizado pelo Estado de São Paulo em relação ao dia anterior realizando a soma dos dias definidos pelo usuario.",style={"color":"#3B332D"}),
 
                                 html.H6("Óbitos Acumulados", style={"color": "#1f1b18", "font-weight": "bold","padding-top":"10px"}),
-                                html.B("O número de óbitos acumulados por COVID-19, foi disponibilizado pelo Estado de São Paulo em relação ao dia anterior.",style={"color":"#3B332D"}),
+                                html.H4("O número de óbitos acumulados por COVID-19, foi disponibilizado pelo Estado de São Paulo em relação ao dia anterior.",style={"color":"#3B332D"}),
 
                                 html.H6("Novos óbitos no período", style={"color": "#1f1b18", "font-weight": "bold","padding-top":"10px"}),
-                                html.B("O número de novos óbitos no período por COVID-19, foi disponibilizado pelo Estado de São Paulo em relação ao dia anterior realizando a soma dos dias definidos pelo usuario",style={"color": "#3B332D"}),
+                                html.H4("O número de novos óbitos no período por COVID-19, foi disponibilizado pelo Estado de São Paulo em relação ao dia anterior realizando a soma dos dias definidos pelo usuario",style={"color": "#3B332D"}),
 
                                 html.H6("População", style={"color": "#1f1b18", "font-weight": "bold","padding-top":"10px"}),
-                                html.B("O número da população, foi disponibilizado pelo Estado de São Paulo e pode conter uma divergência com a realiadade.",
+                                html.H4("O número da população, foi disponibilizado pelo Estado de São Paulo e pode conter uma divergência com a realiadade.",
                                     style={"color": "#3B332D"}),
 
                                 html.H5("Indicadores básicos:", style={"color": "#1f1b18", "font-weight": "bold","padding-top":"10px"}),
                                 html.H6("Porcentagem Imunizados", style={"color": "#1f1b18", "font-weight": "bold"}),
-                                html.B("A porcentagem de imunizados é dada pelo total de população do estado de São Paulo e seus respectivos municípios, e pelo total de imunizados até o presente momento.",
+                                html.H4("A porcentagem de imunizados é dada pelo total de população do estado de São Paulo e seus respectivos municípios, e pelo total de imunizados até o presente momento.",
                                     style={"color": "#3B332D"}),
 
                                 html.H6("Taxa de Letalidade", style={"color": "#1f1b18", "font-weight": "bold","padding-top":"10px"}),
-                                html.B("A taxa de letalidade por COVID-19, é feita pelo número de óbitos confirmados em relação, ao total de casos confirmados pelos cidadãos residentes no Estado de São Paulo e seus respectivos Municípios.",
+                                html.H4("A taxa de letalidade por COVID-19, é feita pelo número de óbitos confirmados em relação, ao total de casos confirmados pelos cidadãos residentes no Estado de São Paulo e seus respectivos Municípios.",
                                     style={"color": "#3B332D"}),
 
                                 html.H5("Fonte", style={"color": "#1f1b18", "font-weight": "bold","padding-top":"10px"}),
@@ -899,15 +889,66 @@ def display_vacinas(location):
         df_data_vacinas = df_data_vacinas.append(dict(zip(df_vacinas.columns, ['Estado', '3º DOSE', soma_terceira])),ignore_index=True)
         df_data_vacinas = df_data_vacinas.append(dict(zip(df_vacinas.columns, ['Estado', '2º DOSE', soma_segunda])),ignore_index=True)
         df_data_vacinas = df_data_vacinas.append(dict(zip(df_vacinas.columns, ['Estado', '1º DOSE', soma_primeira])),ignore_index=True)
-        df_data_vacinas = df_data_vacinas.query('Município=="Estado"') #alterar para dados do estado
+        df_data_vacinas = df_data_vacinas.query('nome_munic=="Estado"') #alterar para dados do estado
     else:
-        df_data_vacinas = df_vacinas[df_vacinas["Município"] == location]
+        df_data_vacinas = df_vacinas[df_vacinas["nome_munic"] == location]
 
     # update grafico
     fig0.update_traces(go.Bar(x=df_data_vacinas["Total Doses Aplicadas"], y=df_data_vacinas["Dose"],text=df_data_vacinas["Total Doses Aplicadas"],marker_color='#db261f'))
     return (
         fig0
     )
+
+    # Vacinometro
+@app.callback(
+    Output("vacinas-graph2", "figure"),
+    [
+    Input("location-dropdown", "value")
+    ]
+)
+def display_imunizados(location):
+    df_vacinastratado = pd.read_csv('docs/df_vacinastratado.csv')
+    if not location:
+        df_data_imunizados1 = df_vacinastratado["segundadose"].sum()
+        df_data_imunizados2 = df_vacinastratado["doseunica"].sum()
+        df_data_imunizados3 = (df_data_imunizados2 + df_data_imunizados1)
+        df_nao_imunizados2 = (44639899 - df_data_imunizados3)
+        labels = ['Não Imunizados','Imunizados']
+        values = [(df_nao_imunizados2), (df_data_imunizados3)]
+    else:
+        df_vacinastratado = df_vacinastratado[df_vacinastratado['nome_munic'] == location]
+        pop = df_vacinastratado['pop'].values[0]
+
+        df_data_imunizados = df_vacinas[df_vacinas["nome_munic"] == location]
+        df_data_imunizados.loc[-1] = [location, 'pop', pop]
+        df_data_imunizados = df_data_imunizados.sort_index()
+        df_data_imunizados.index = df_data_imunizados.index + 1
+
+        df_data_imunizadosunica = df_data_imunizados[df_data_imunizados['Dose'] == 'UNICA']
+        df_data_imunizadosunica = df_data_imunizadosunica['Total Doses Aplicadas'].values[0]
+
+        df_data_imunizados2 = df_data_imunizados[df_data_imunizados['Dose'] == '2° DOSE']
+        df_data_imunizados2 = df_data_imunizados2['Total Doses Aplicadas'].values[0]
+
+        df_data_imunizadostotal = df_data_imunizados2 + df_data_imunizadosunica
+        df_data_imunizados.loc[-1] = [location, 'Imunizados', df_data_imunizadostotal]
+        df_data_imunizados = df_data_imunizados.sort_index()
+        df_data_imunizados.index = df_data_imunizados.index + 1
+
+        df_data_naoimunizados = df_data_imunizados[df_data_imunizados['Dose'] == 'pop']
+        df_data_naoimunizados = df_data_naoimunizados['Total Doses Aplicadas'].values[0]
+
+        df_data_naoimunizados = df_data_naoimunizados - df_data_imunizadostotal
+        df_data_imunizados.loc[-1] = [location, 'Não Imunizados', df_data_naoimunizados]
+        df_data_imunizados = df_data_imunizados.sort_index()
+        df_data_imunizados.index = df_data_imunizados.index + 1
+        df_data_imunizados = df_data_imunizados.query("Dose == 'Não Imunizados' | Dose == 'Imunizados'")
+        values = df_data_imunizados['Total Doses Aplicadas']
+        labels = df_data_imunizados['Dose']
+    fig5.update_traces(go.Pie(values=values, labels=labels))
+    return(
+        fig5
+)
 
 # ==================================================================
 # Grafico Card 2 e 3
