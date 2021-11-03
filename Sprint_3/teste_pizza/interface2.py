@@ -7,8 +7,11 @@ import dash_core_components as dcc
 import dash_html_components as html
 from dash.dependencies import Input, Output, State
 import dash_bootstrap_components as dbc
-import plotly.express as px
+
+# ==================================================================
+# Bibliotecas dos graficos e tabelas
 import plotly.graph_objects as go
+import dash_table as dt
 
 # ==================================================================
 # Bibliotecas de manipulação de dados
@@ -19,84 +22,147 @@ import pandas as pd
 df_tratado = pd.read_csv("docs/df_tratado.csv")
 df_vacinastratado = pd.read_csv("docs/df_vacinastratado.csv")
 df_estadotratado = pd.read_csv("docs/df_estadotratado.csv")
-df_vacinas = pd.read_csv("docs/vacinas", sep=';')
-#df_tratado['datahora'] = pd.to_datetime(df_tratado['datahora'],format='%d/%m/%Y') #formatação de datahotra
+df_vacinas = pd.read_csv("docs/vacinas.csv", sep=';')
 list_municipios = sorted(df_tratado['nome_munic'].unique()) #formatação de municipios
+date_column = df_tratado["datahora"]
+max = date_column.max()
+row = df_tratado.loc[df_tratado["datahora"] == max]
+df_vacinastratadonotpop = df_vacinastratado.drop(columns=['pop'])
+df_totais = pd.merge(row,df_vacinastratadonotpop, how='inner', on='nome_munic')
+df_totais = df_totais.drop(
+    columns=['Unnamed: 0_x', 'Unnamed: 0_y'])
+df_tratado_rename = df_totais.rename(
+                columns={'nome_munic': 'Localização', 'casos': 'Casos Acumulados', 'datahora': 'Data da Atualização',
+                         'obitos': "Óbitos Acumulados","pop": "População","doseunica":"Dose Unica","primeiradose":"Primeira Dose",
+                         "segundadose":"Segunda Dose","terceiradose":"Terceira Dose"})
+df_tratado_rename = df_tratado_rename.reindex(
+                columns=['Localização', 'Casos Acumulados', 'Óbitos Acumulados','Dose Unica','Primeira Dose','Segunda Dose','Terceira Dose','População', 'Data da Atualização'])
+
+casosacumulados = df_tratado_rename["Casos Acumulados"].sum()
+obitossacumulados = df_tratado_rename["Óbitos Acumulados"].sum()
+doseunica = df_tratado_rename["Dose Unica"].sum()
+primeiradose = df_tratado_rename["Primeira Dose"].sum()
+segundadose = df_tratado_rename["Segunda Dose"].sum()
+terceiradose = df_tratado_rename["Terceira Dose"].sum()
+populacao = df_tratado_rename["População"].sum()
+data = df_tratado_rename['Data da Atualização'].max()
+df_tratado_rename = df_tratado_rename.append(dict(zip(df_tratado_rename.columns, ['ESTADO DE SÃO PAULO', casosacumulados,obitossacumulados,doseunica,primeiradose,segundadose,terceiradose,populacao,data])),ignore_index=True)
+list_tabela=['ESTADO DE SÃO PAULO','SÃO PAULO', 'GUARULHOS', 'CAMPINAS', 'SÃO BERNARDO DO CAMPO', 'SÃO JOSÉ DOS CAMPOS', 'SANTO ANDRÉ']
+list_municipios2 = sorted(df_tratado_rename['Localização'].unique())
 
 # ==================================================================
 # Graficos
+# Grafico bar casos novos
 fig0 = go.Figure()
-fig0.add_trace(go.Pie(values= df_vacinas["Total Doses Aplicadas"], labels=df_vacinas["Dose"]))
+fig0.add_trace(go.Bar(x=df_vacinas["Total Doses Aplicadas"], y=df_vacinas["Dose"],text=df_vacinas["Total Doses Aplicadas"],marker_color='#db261f',orientation='h'),)
 fig0.update_layout(
-    title_text='<b>Imunização\b',
+    yaxis=dict(showline=True,showticklabels=True,linewidth=2,linecolor='rgb(204, 204, 204)'),
+    xaxis=dict(ticks="outside",gridcolor='#f1f1f1',showline=True,showticklabels=True,linewidth=2,linecolor='rgb(204, 204, 204)'),
+    title='<b>Vacinas Aplicadas',
     font=dict(family='Gill Sans, sans-serif',size=12,color='#1f1b18'),
+    xaxis_title='Total de Doses Aplicadas',
+    yaxis_title='Dose',
+    plot_bgcolor='white',
     title_x = 0.5,
     autosize=True,
-    margin = dict(l=90, r=50, t=80, b=70),
-)
+    margin = dict(l=50, r=30, t=40, b=90))
 
+# Grafico pizza imunizados
+# colors = ['#BDBDBD','#757575','#db261f','#1f1b18']
+# fig0 = go.Figure()
+# fig0.add_trace(go.Pie(values= df_teste["Total Doses Aplicadas"], labels=df_vacinas["Dose"],hole=.3,marker=dict(colors=colors)))
+# fig0.update_layout(
+#     title_text='<b>Vacinomêtro',
+#     font=dict(family='Gill Sans, sans-serif',size=12,color='#1f1b18'),
+#     title_x = 0.5,
+#     autosize=True,
+#     margin = dict(l=100, r=50, t=80, b=70),
+# )
+
+# Grafico linha casos
 fig1 = go.Figure()
-fig1.add_trace(go.Scatter(x=df_estadotratado["datahora"], y=df_estadotratado["casos"],line=dict(color='#db261f')))
+fig1.add_trace(go.Scatter(x=df_estadotratado["datahora"], y=df_estadotratado["casos"],fill='tozeroy',line_shape='spline',line=dict(color='#db261f',width=2)))
 fig1.update_layout(
-    yaxis=dict(showline=True,showticklabels=True,linewidth=2,linecolor='rgb(204, 204, 204)'),
-    xaxis=dict(showline=True,showticklabels=True,linewidth=2,linecolor='rgb(204, 204, 204)'),
-    title='<b>Casos Acumulados por Período\b',
+    yaxis=dict(ticks="outside",gridcolor='#f1f1f1',showline=True,showticklabels=True,linewidth=2,linecolor='rgb(204, 204, 204)'),
+    xaxis=dict(gridcolor='#f1f1f1',showline=True,showticklabels=True,linewidth=2,linecolor='rgb(204, 204, 204)'),
+    title='<b>Casos Acumulados por Período',
     font=dict(family='Gill Sans, sans-serif',size=12,color='#1f1b18'),
     xaxis_title='Data',
     yaxis_title='Casos Acumulados',
     plot_bgcolor='white',
     title_x = 0.5,
     autosize=True,
-    margin = dict(l=100, r=50, t=80, b=70),
+    margin = dict(l=50, r=30, t=40, b=80),
 )
 
+# Grafico bar casos novos
 fig2 = go.Figure()
 fig2.add_trace(go.Bar(x=df_estadotratado["datahora"], y=df_estadotratado["casos_novos"],text=df_estadotratado["casos_novos"],marker_color='#db261f'),)
 fig2.update_layout(
-    yaxis=dict(showline=True,showticklabels=True,linewidth=2,linecolor='rgb(204, 204, 204)'),
+    yaxis=dict(ticks="outside",gridcolor='#f1f1f1',showline=True,showticklabels=True,linewidth=2,linecolor='rgb(204, 204, 204)'),
     xaxis=dict(showline=True,showticklabels=True,linewidth=2,linecolor='rgb(204, 204, 204)'),
-    title='<b>Casos Novos por Período\b',
+    title='<b>Casos Novos por Período',
     font=dict(family='Gill Sans, sans-serif',size=12,color='#1f1b18'),
     xaxis_title='Data',
     yaxis_title='Casos Novos',
     plot_bgcolor='white',
     title_x = 0.5,
     autosize=True,
-    margin = dict(l=90, r=50, t=80, b=70))
+    margin = dict(l=85, r=20, t=40, b=80))
 
+# Grafico linhas obitos
 fig3 = go.Figure()
-fig3.add_trace(go.Scatter(x=df_estadotratado["datahora"], y=df_estadotratado["obitos"],line=dict(color='#db261f')))
+fig3.add_trace(go.Scatter(x=df_estadotratado["datahora"], y=df_estadotratado["obitos"],fill='tozeroy',line_shape='spline',line=dict(color='#db261f',width=2)))
 fig3.update_layout(
-    yaxis=dict(showline=True,showticklabels=True,linewidth=2,linecolor='rgb(204, 204, 204)'),
-    xaxis=dict(showline=True,showticklabels=True,linewidth=2,linecolor='rgb(204, 204, 204)'),
-    title='<b>Óbitos Acumulados por Período\b',
+    yaxis=dict(ticks="outside",gridcolor='#f1f1f1',showline=True,showticklabels=True,linewidth=2,linecolor='rgb(204, 204, 204)'),
+    xaxis=dict(gridcolor='#f1f1f1',showline=True,showticklabels=True,linewidth=2,linecolor='rgb(204, 204, 204)'),
+    title='<b>Óbitos Acumulados por Período',
     font=dict(family='Gill Sans, sans-serif',size=12,color='#1f1b18'),
     xaxis_title='Data',
     yaxis_title='Óbitos Acumulados',
     plot_bgcolor='white',
     title_x = 0.5,
     autosize=True,
-    margin = dict(l=100, r=50, t=80, b=70),
+    margin = dict(l=50, r=30, t=40, b=80),
 )
 
+# Grafico bar obitos novos
 fig4 = go.Figure()
 fig4.add_trace(go.Bar(x=df_estadotratado["datahora"], y=df_estadotratado["obitos_novos"],text=df_estadotratado["obitos_novos"],marker_color='#db261f'),)
 fig4.update_layout(
-    yaxis=dict(showline=True,showticklabels=True,linewidth=2,linecolor='rgb(204, 204, 204)'),
+    yaxis=dict(ticks="outside", gridcolor='#f1f1f1',showline=True,showticklabels=True,linewidth=2,linecolor='rgb(204, 204, 204)'),
     xaxis=dict(showline=True,showticklabels=True,linewidth=2,linecolor='rgb(204, 204, 204)'),
-    title='<b>Óbitos Novos por Período\b',
+    title='<b>Óbitos Novos por Período',
     font=dict(family='Gill Sans, sans-serif',size=12,color='#1f1b18'),
     xaxis_title='Data',
     yaxis_title='Óbitos Novos',
     plot_bgcolor='white',
     title_x = 0.5,
     autosize=True,
-    margin = dict(l=90, r=50, t=80, b=70))
+    margin = dict(l=85, r=20, t=40, b=80),
+    showlegend=False)
+
+# Grafico de linha letalidade
+fig6 = go.Figure()
+fig6.add_trace(go.Scatter(x=df_tratado["datahora"], y=df_tratado["casos_novos"], fill='tozeroy',line_shape='spline',line=dict(color='#db261f',width=2)))
+fig6.update_layout(
+    yaxis=dict(ticks="outside",gridcolor='#f1f1f1',showline=True,showticklabels=True,linewidth=2,linecolor='rgb(204, 204, 204)'),
+    xaxis=dict(gridcolor='#f1f1f1',showline=True,showticklabels=True,linewidth=2,linecolor='rgb(204, 204, 204)'),
+    title='<b>Letalidade por Período',
+    font=dict(family='Gill Sans, sans-serif',size=12,color='#1f1b18'),
+    xaxis_title='Data',
+    yaxis_title='Letalidade (%)',
+    plot_bgcolor='white',
+    title_x = 0.5,
+    autosize=True,
+    margin = dict(l=50, r=30, t=40, b=80),
+    showlegend=False
+)
 
 # ==================================================================
 # Layout
 app = dash.Dash(__name__, external_stylesheets=[dbc.themes.SANDSTONE],title='SPanel | COVID-19',update_title="Iniciando...")
-app.layout = dbc.Container([
+app.layout = dbc.Spinner(dbc.Container([
     # Linha 1 - Cabeçario
     dbc.Row([
         # Dados e logotipo
@@ -303,7 +369,7 @@ app.layout = dbc.Container([
                 # Dropdown de Municipios
                 dbc.Col([
                     html.Div([
-                        dcc.Dropdown(id="location-dropdown",
+                        dcc.Dropdown(id="location-dropdown",className="location-dropdown",
                                      options=[{"label": i, "value": i} for i in list_municipios]
                                      ,clearable=True,placeholder="Escolha um município",
                                      style={"background-color": "#1f1b18"}
@@ -316,7 +382,7 @@ app.layout = dbc.Container([
 
 # ==================================================================
     # Linha 2 - Vacinados, Casos, Obitos e População
-    , dbc.Row([
+    ,dbc.Row([
         # Coluna 1 - Vacinados
         dbc.Col([
             dbc.Card([
@@ -354,10 +420,10 @@ app.layout = dbc.Container([
                             html.H6("% Imunizados", style={"color": "#f1f1f1", "font-weight": "bold"}),
                             html.H2(style={"color": "#f1f1f1"},
                             id="porcentagemimunizados-text")
-                        ],md=5,style={'margin-bottom':'5px'})
+                        ],md=5)
                     ])
                 ])
-            ], color="#db261f",className='cards',style={"margin-left": "5px"})
+            ],className='cardsteste',style={"margin-left": "5px"})
         ], md=3),
         # Coluna 2 - Casos
         dbc.Col([
@@ -467,65 +533,252 @@ app.layout = dbc.Container([
                         ],md=12)
                     ])
                 ])
-            ], color="#201b17",className='cards',style={"margin-right": "5px"})
+            ],className='cardsteste2',style={"margin-right": "5px"})
         ], md=3)
-    ], style={"border-bottom": "10px solid #f1f1f1", "background-image": "linear-gradient(#1f1b18 50%, #f1f1f1 50%)"})
-    , dbc.Row([
+    ], style={"background-image": "linear-gradient(#1f1b18 50%, #f1f1f1 50%)"})
+    # Graficos
+    ,dbc.Row([
         dbc.Col([
             dcc.Markdown(['''>
         > Imunizados
-        >'''], className="lb_imunizados")
+        >'''], className="lb_imunizados",style={'margin-top':'30px','margin-left':'10px'})
         ])
     ])
-    , dbc.Row([
+    ,dbc.Row([
         dbc.Col([
-            dcc.Graph(id="vacinas-graph")
+            dbc.Card([
+                dbc.CardBody([
+                    dcc.Graph(id="vacinas-graph",className = 'graph1')
+                ])
+            ],className="cardgraph")
         ], md=6)
-        , dbc.Col([
-            #dcc.Graph(id="casos-graph3", figure=fig1) #E AQUI TAMBÉM, PODE TIRAR ESSES DOIS
+        ,dbc.Col([
+            dbc.Card([
+                dbc.CardBody([
+                    dcc.Graph(id="vacinas-graph2", className='graph2')
+                ])
+            ],className="cardgraph2")
         ], md=6)
     ])
     ,dbc.Row([
         dbc.Col([
             dcc.Markdown(['''>
             > Casos Confirmados
-            >'''],className="lb_imunizados",style={'margin-top':'50px'})
+            >'''],className="lb_imunizados",style={'margin-top':'40px','margin-left':'10px'})
         ])
     ])
-    ,dbc.Row([
+    , dbc.Row([
         dbc.Col([
-            dcc.Graph(id="casos-graph",className = 'graph1',)
-        ],md=6)
-        ,dbc.Col([
-            dcc.Graph(id="casosnovos-graph",className = 'graph2')
-        ],md=6)
+            dbc.Card([
+                dbc.CardBody([
+                    dcc.Graph(id="casos-graph", className='graph1')
+                ])
+            ],className="cardgraph")
+        ], md=6)
+        , dbc.Col([
+            dbc.Card([
+                dbc.CardBody([
+                    dcc.Graph(id="casosnovos-graph", className='graph2')
+                ])
+            ],className="cardgraph2")
+        ], md=6)
     ])
     ,dbc.Row([
         dbc.Col([
             dcc.Markdown(['''>
         > Óbitos Confirmados
-        >'''], className="lb_imunizados",style={'margin-top':'50px'})
+        >'''], className="lb_imunizados",style={'margin-top':'40px','margin-left':'10px'})
         ])
     ])
-    ,dbc.Row([
+    , dbc.Row([
         dbc.Col([
-            dcc.Graph(id="obitos-graph",className = 'graph1',)
-        ],md=6)
-        ,dbc.Col([
-            dcc.Graph(id="obitosnovos-graph",className = 'graph2')
-        ],md=6)
+            dbc.Card([
+                dbc.CardBody([
+                    dcc.Graph(id="obitos-graph", className='graph1')
+                ])
+            ],className="cardgraph")
+        ], md=6)
+        , dbc.Col([
+            dbc.Card([
+                dbc.CardBody([
+                    dcc.Graph(id="obitosnovos-graph", className='graph2')
+                ])
+            ],className="cardgraph2")
+        ], md=6)
     ])
     ,dbc.Row([
         dbc.Col([
             dcc.Markdown(['''>
         > População
-        >'''], className="lb_imunizados",style={'margin-top':'50px'})
+        >'''], className="lb_imunizados",style={'margin-top':'40px','margin-left':'10px'})
         ])
     ])
-], fluid=True)
+    , dbc.Row([
+        dbc.Col([
+            dbc.Card([
+                dbc.CardBody([
+                    dcc.Graph(id="letalidade-graph", className='graph1')
+                ])
+            ],className="cardgraph")
+        ], md=6)
+        , dbc.Col([
+            dbc.Card([
+                dbc.CardBody([
+                    dcc.Graph(id="mortes-graph2", className='graph2')
+                ])
+            ],className="cardgraph2")
+        ], md=6)
+    ])
+    # Tabela
+    , dbc.Row([
+        dbc.Col([
+            dcc.Markdown(['''>
+    > Tabela de Visualização
+    >'''], className="lb_imunizados", style={'margin-top': '40px', 'margin-left': '10px'})
+        ])
+    ])
+    , dbc.Row([
+        dbc.Col([
+                dbc.Card([
+                    dbc.CardBody([
+                         dcc.Dropdown(
+                                id='demo-dropdown',className="demo-dropdown",
+                                options=[{"label": i, "value": i} for i in list_municipios2],
+                                value=list_tabela,
+                                persistence = "ESTADO DE SÃO PAULO",
+                                placeholder="Escolha uma localidade",
+                                clearable=True,
+                                multi=True
+                            ),
+                        # Tabela
+                        dt.DataTable(
+                            id='table',
+                            data=df_tratado_rename.to_dict('records'),
+                            columns=[{"name": i, "id": i} for i in (df_tratado_rename.columns)],
+                            style_table={'overflowY': 'auto', 'height': '300px'},
+                            style_cell={'minWidth': '95px', 'width': '180px', 'maxWidth': '180px', 'whiteSpace': 'auto',
+                                        'height': 'auto'},
+                            editable=False,
+                            sort_action="native",
+                            sort_mode="single",
+                            row_deletable=False,
+                            selected_columns=[],
+                            selected_rows=[],
+                            page_current=0,
+                            page_action="native",
+                            fixed_rows={'headers': True},
+                            style_header={"color": "#f1f1f1", "background-color": "#1f1b18",
+                                          'font-family': 'Gill Sans, sans-serif', "font-weight": "bold"},
+                            style_data={"color": "#3B332D", 'font-family': 'Gill Sans, sans-serif',
+                                        'border': '1px solid grey', 'whiteSpace': 'normal'},
+                            style_data_conditional=[
+                                                       {
+                                                           'if': {
+                                                               'filter_query': '{{Casos Acumulados}} = {}'.format(
+                                                                   df_tratado_rename['Casos Acumulados'].max()),
+                                                               'column_id': 'Casos Acumulados',
+
+                                                           },
+                                                           'backgroundColor': '#E68B8B',
+                                                           'color': 'white'
+                                                       },
+
+                                                   ] +
+                                                   [
+                                                       {
+                                                           'if': {
+                                                               'filter_query': '{{Óbitos Acumulados}} = {}'.format(
+                                                                   df_tratado_rename['Óbitos Acumulados'].max()),
+                                                               'column_id': 'Óbitos Acumulados',
+                                                           },
+                                                           'backgroundColor': '#E68B8B',
+                                                           'color': 'white'
+                                                       },
+                                                   ] +
+                                                   [
+                                                       {
+                                                           'if': {
+                                                               'filter_query': '{{Dose Unica}} = {}'.format(
+                                                                   df_tratado_rename['Dose Unica'].max()),
+                                                               'column_id': 'Dose Unica',
+                                                           },
+                                                           'backgroundColor': '#E68B8B',
+                                                           'color': 'white'
+                                                       },
+                                                   ] +
+                                                   [
+                                                       {
+                                                           'if': {
+                                                               'filter_query': '{{Primeira Dose}} = {}'.format(
+                                                                   df_tratado_rename['Primeira Dose'].max()),
+                                                               'column_id': 'Primeira Dose',
+                                                           },
+                                                           'backgroundColor': '#E68B8B',
+                                                           'color': 'white'
+                                                       },
+                                                   ] +
+                                                   [
+                                                       {
+                                                           'if': {
+                                                               'filter_query': '{{Segunda Dose}} = {}'.format(
+                                                                   df_tratado_rename['Segunda Dose'].max()),
+                                                               'column_id': 'Segunda Dose',
+                                                           },
+                                                           'backgroundColor': '#E68B8B',
+                                                           'color': 'white'
+                                                       },
+                                                   ] +
+                                                   [
+                                                       {
+                                                           'if': {
+                                                               'filter_query': '{{Terceira Dose}} = {}'.format(
+                                                                   df_tratado_rename['Terceira Dose'].max()),
+                                                               'column_id': 'Terceira Dose',
+                                                           },
+                                                           'backgroundColor': '#E68B8B',
+                                                           'color': 'white'
+                                                       },
+                                                   ] +
+                                                   [
+                                                       {
+                                                           'if': {
+                                                               'filter_query': '{{População}} = {}'.format(
+                                                                   df_tratado_rename['População'].max()),
+                                                               'column_id': 'População',
+                                                           },
+                                                           'backgroundColor': '#E68B8B',
+                                                           'color': 'white'}
+                                                   ],
+                            tooltip_delay=0,
+                            tooltip_duration=None)
+                        ])
+                    ],className='card-tabela')
+            ])
+        ])
+    ,dbc.Row([
+        dbc.Col([
+            html.Div([
+                dbc.Row([
+                    html.H6("Painel de COVID-19 do Estado de São Paulo | ©Fluffy2021",style={"color":"#1f1b18","margin-top":"30px",'text-align': 'center'}),
+                ],style={'display': 'block','margin-left': 'auto','margin-right': 'auto'}),
+                dbc.Row([
+                    dcc.Link(children=html.Img(id="github-button", src="assets/github-button.png", width=25, style={'position': 'absolute',"margin-top": "3px",'left': '48%','margin-right': '-53%'}),href='https://github.com/fluffyfatec/SPanel',
+                         refresh=True),
+                    dcc.Link(children=html.Img(id="instagram-button", src="assets/instagram-buttom.png", width=25, style={'position': 'absolute',"margin-top": "3px",'left': '50%','margin-right': '-50%'}),href='https://www.instagram.com/fluffyapi/',
+                         refresh=True),
+                    dcc.Link(children=html.Img(id="email-button", src="assets/email-button.png", width=25, style={'position': 'absolute',"margin-top": "3px",'left': '52%','margin-right': '-48%'}),href='fluffyfatec@gmail.com',
+                         refresh=True)
+                ],style={"margin-bottom":"3%"})
+            ])
+        ])
+    ],style={"justify-content": "center"})
+], fluid=True,style={"background-color": "#f1f1f1"}),fullscreen=True,show_initially=True,spinnerClassName="spinner",type=None)
 
 # ==================================================================
 # Interatividade
+
+# ==================================================================
+# Cards
 @app.callback(
     [
         Output("imunizados-text", "children"),
@@ -547,18 +800,14 @@ def display_status(location, start_date,end_date):
     if not location:
         df_data_var_date = df_estadotratado[(df_estadotratado['datahora'] >= start_date) & (df_estadotratado['datahora'] <= end_date)]
         df_data_on_date = df_estadotratado[(df_estadotratado["datahora"] == end_date)]
-        # df_data_var_date = df_data_var_date.assign(obitos_novos=df_data_var_date['obitos_novos'].sum())# SOMAR PARA TRAZER ESTADO DE SP
-        # df_data_on_date = df_data_on_date.assign(obitos=df_data_on_date['obitos'].sum())  # SOMAR PARA TRAZER ESTADO DE SP
-        # df_data_var_date = df_data_var_date.assign(casos_novos=df_data_var_date['casos_novos'].sum())  # SOMAR PARA TRAZER ESTADO DE SP
-        # df_data_on_date = df_data_on_date.assign(casos=df_data_on_date['casos'].sum())  # SOMAR PARA TRAZER ESTADO DE SP
-        # df_data_on_date = df_data_on_date.assign(pop=df_data_on_date['pop'].sum())  # SOMAR PARA TRAZER ESTADO DE SP
         df_data_vacinastratado = df_vacinastratado.assign(doseunica=df_vacinastratado["doseunica"].sum())
-        df_data_vacinastratado = df_data_vacinastratado.assign(segundadose=df_data_vacinastratado["segundadose"].sum())
-        df_data_vacinastratado = df_data_vacinastratado.assign(Imunizados=df_data_vacinastratado['doseunica'] + df_data_vacinastratado['segundadose'])  # SOMAR PARA TRAZER ESTADO DE SP
-        df_data_on_date = df_data_on_date.assign(porcentagemimunizados=df_data_vacinastratado['Imunizados'] / df_data_on_date['pop'] * 100)
-        decimals = 2
-        df_data_on_date['porcentagemimunizados'] = df_data_on_date['porcentagemimunizados'].apply(lambda x: round(x, decimals))
         df_data_vacinastratado = df_data_vacinastratado.assign(primeiradose=df_data_vacinastratado["primeiradose"].sum())
+        df_data_vacinastratado = df_data_vacinastratado.assign(segundadose=df_data_vacinastratado["segundadose"].sum())
+        df_data_vacinastratado = df_data_vacinastratado.assign(pop=df_data_vacinastratado["pop"].sum())
+        df_data_vacinastratado = df_data_vacinastratado.assign(Imunizados=df_data_vacinastratado['doseunica'] + df_data_vacinastratado['segundadose'])  # SOMAR PARA TRAZER ESTADO DE SP
+        df_data_vacinastratado = df_data_vacinastratado.assign(porcentagemimunizados=df_data_vacinastratado['Imunizados'] / df_data_vacinastratado['pop'] * 100)
+        decimals = 2
+        df_data_vacinastratado['porcentagemimunizados'] = df_data_vacinastratado['porcentagemimunizados'].apply(lambda x: round(x, decimals))
         df_data_on_date = df_data_on_date.assign(letalidade=df_data_on_date['obitos'] / df_data_on_date['casos'] * 100)
         df_data_on_date['letalidade'] = df_data_on_date['letalidade'].apply(lambda x: round(x, decimals))
     else:
@@ -568,17 +817,17 @@ def display_status(location, start_date,end_date):
         df_data_on_date = df_data_var_date[(df_data_var_date["datahora"] == end_date)]
         df_data_var_date = df_data_var_date.assign(obitos_novos=df_data_var_date['obitos_novos'].sum())
         df_data_var_date = df_data_var_date.assign(casos_novos=df_data_var_date['casos_novos'].sum())
-        df_data_vacinastratado = df_data_vacinastratado.assign(Imunizados=df_data_vacinastratado['doseunica'] + df_data_vacinastratado['segundadose'])
-        df_data_on_date = df_data_on_date.assign(porcentagemimunizados=df_data_vacinastratado['Imunizados'] / df_data_on_date['pop'] * 100)
+        df_data_vacinastratado = df_data_vacinastratado.assign(Imunizados=df_data_vacinastratado['doseunica'] + df_data_vacinastratado['segundadose'])  # SOMAR PARA TRAZER ESTADO DE SP
+        df_data_vacinastratado = df_data_vacinastratado.assign(porcentagemimunizados=df_data_vacinastratado['Imunizados'] / df_data_vacinastratado['pop'] * 100)
         decimals = 2
-        df_data_on_date['porcentagemimunizados'] = df_data_on_date['porcentagemimunizados'].apply(lambda x: round(x, decimals))
+        df_data_vacinastratado['porcentagemimunizados'] = df_data_vacinastratado['porcentagemimunizados'].apply(lambda x: round(x, decimals))
         df_data_on_date = df_data_on_date.assign(letalidade=df_data_on_date['obitos'] / df_data_on_date['casos'] * 100)
         df_data_on_date['letalidade'] = df_data_on_date['letalidade'].apply(lambda x: round(x, decimals))
 
 # Filtrando caso os dados sejam vazios e trocando ',' por '.'
     imunizados = "-" if df_data_vacinastratado["Imunizados"].isna().values[0] else f'{int(df_data_vacinastratado["Imunizados"].values[0]):,}'.replace(",", ".")
     primeiradose = "-" if df_data_vacinastratado["primeiradose"].isna().values[0] else f'{int(df_data_vacinastratado["primeiradose"].values[0]):,}'.replace(",", ".")
-    porcentagemimunizados = "-" if df_data_on_date["porcentagemimunizados"].isna().values[0] else f'{float(df_data_on_date["porcentagemimunizados"].values[0]):,}'.replace(",", ".")
+    porcentagemimunizados = "-" if df_data_vacinastratado["porcentagemimunizados"].isna().values[0] else f'{float(df_data_vacinastratado["porcentagemimunizados"].values[0]):,}'.replace(",", ".")
     acumulados_novos = "-" if df_data_on_date["casos"].isna().values[0] else  f'{int(df_data_on_date["casos"].values[0]):,}'.replace(",", ".")
     novos_caso = "-" if df_data_var_date["casos_novos"].isna().values[0] else f'{int(df_data_var_date["casos_novos"].values[0]):,}'.replace(",", ".")
     obacumulados_novos = "-" if df_data_on_date["obitos"].isna().values[0] else f'{int(df_data_on_date["obitos"].values[0]):,}'.replace(",", ".")
@@ -597,7 +846,29 @@ def display_status(location, start_date,end_date):
             populacao,
             f'{letalidade}%')
 
+
+#====================================================================
+# Chamada Tabela
+
+@app.callback(
+    Output("table", "data"),
+    Input("demo-dropdown", "value")
+)
+def update_table(location):
+
+    if location is not None:
+        date_column = df_tratado_rename["Data da Atualização"]
+        max = date_column.max()
+        row = df_tratado_rename.loc[df_tratado_rename["Data da Atualização"] == max]
+        df_municipios = row[row["Localização"].isin(location)]
+        df_loc = df_municipios.to_dict('records')
+        return df_loc
+
+# ==================================================================
 # Chamada graficos
+
+# ==================================================================
+# Grafico Card 1
 @app.callback(
     Output("vacinas-graph", "figure"),
     [
@@ -605,21 +876,35 @@ def display_status(location, start_date,end_date):
     ]
 )
 def display_vacinas(location):
+
     if not location:
-        df_data_vacinas = df_vacinas[df_vacinas["Município"] == location]
+        soma_unica = df_vacinastratado['doseunica'].sum()
+        soma_terceira = df_vacinastratado['terceiradose'].sum()
+        soma_segunda = df_vacinastratado['segundadose'].sum()
+        soma_primeira = df_vacinastratado['primeiradose'].sum()
+        df_data_vacinas = df_vacinas.append(dict(zip(df_vacinas.columns, ['Estado', 'UNICA', soma_unica])),ignore_index=True)
+        df_data_vacinas = df_data_vacinas.append(dict(zip(df_vacinas.columns, ['Estado', '3º DOSE', soma_terceira])),ignore_index=True)
+        df_data_vacinas = df_data_vacinas.append(dict(zip(df_vacinas.columns, ['Estado', '2º DOSE', soma_segunda])),ignore_index=True)
+        df_data_vacinas = df_data_vacinas.append(dict(zip(df_vacinas.columns, ['Estado', '1º DOSE', soma_primeira])),ignore_index=True)
+        df_data_vacinas = df_data_vacinas.query('Município=="Estado"') #alterar para dados do estado
     else:
         df_data_vacinas = df_vacinas[df_vacinas["Município"] == location]
 
-    fig0.update_traces(go.Pie(values= df_data_vacinas["Total Doses Aplicadas"],labels=df_data_vacinas["Dose"]))
-    return (fig0)
+    # update grafico
+    fig0.update_traces(go.Bar(x=df_data_vacinas["Total Doses Aplicadas"], y=df_data_vacinas["Dose"],text=df_data_vacinas["Total Doses Aplicadas"],marker_color='#db261f'))
+    return (
+        fig0
+    )
 
-
+# ==================================================================
+# Grafico Card 2 e 3
 @app.callback(
     [
     Output("casos-graph","figure"),
     Output("casosnovos-graph","figure"),
     Output("obitos-graph","figure"),
-    Output("obitosnovos-graph","figure")
+    Output("obitosnovos-graph","figure"),
+    Output("letalidade-graph","figure")
     ],
     [
     Input("location-dropdown", "value"),
@@ -630,21 +915,27 @@ def display_vacinas(location):
 def display_graph(location, start_date, end_date):
     if not location:
         df_data_on_location = df_estadotratado[(df_estadotratado['datahora'] >= start_date) & (df_estadotratado['datahora'] <= end_date)]
-        # df_data_on_location = df_data_on_location.assign(casos=df_data_on_location['casos'].sum())
-        # df_data_on_location = df_data_on_location.assign(casos_novos=df_data_on_location['casos_novos'].sum())# SOMAR PARA TRAZER ESTADO DE SP
+        df_data_on_acumulado = df_estadotratado[(df_estadotratado['datahora'] >= '2020-01-01') & (df_estadotratado['datahora'] <= end_date)]
+        df_data_on_acumulado = df_data_on_acumulado.assign(letalidade=df_data_on_acumulado['obitos'] / df_data_on_acumulado['casos'] * 100)
+        decimals = 2
+        df_data_on_acumulado['letalidade'] = df_data_on_acumulado['letalidade'].apply(lambda x: round(x, decimals))
     else:
         df_data_on_location = df_tratado[df_tratado["nome_munic"] == location]
         df_data_on_location = df_data_on_location[(df_data_on_location['datahora'] >= start_date) & (df_data_on_location['datahora'] <= end_date)]
+        df_data_on_acumulado = df_tratado[df_tratado["nome_munic"] == location]
+        df_data_on_acumulado = df_data_on_acumulado[(df_data_on_acumulado['datahora'] >= '2020-01-01') & (df_data_on_acumulado['datahora'] <= end_date)]
+        df_data_on_acumulado = df_data_on_acumulado.assign(letalidade=df_data_on_acumulado['obitos'] / df_data_on_acumulado['casos'] * 100)
+        decimals = 2
+        df_data_on_acumulado['letalidade'] = df_data_on_acumulado['letalidade'].apply(lambda x: round(x, decimals))
 
-    # upgrade graficos
-    fig1.update_traces(go.Scatter(x=df_data_on_location["datahora"], y=df_data_on_location["casos"]))
+    # update graficos
+    fig1.update_traces(go.Scatter(x=df_data_on_acumulado["datahora"], y=df_data_on_acumulado["casos"]))
     fig2.update_traces(go.Bar(x=df_data_on_location["datahora"], y=df_data_on_location["casos_novos"],text=df_data_on_location["casos_novos"]))
-    fig3.update_traces(go.Scatter(x=df_data_on_location["datahora"], y=df_data_on_location["obitos"]))
-    fig4.update_traces(go.Bar(x=df_data_on_location["datahora"], y=df_data_on_location["obitos_novos"],
-                              text=df_data_on_location["obitos_novos"]))
-
+    fig3.update_traces(go.Scatter(x=df_data_on_acumulado["datahora"], y=df_data_on_acumulado["obitos"]))
+    fig4.update_traces(go.Bar(x=df_data_on_location["datahora"], y=df_data_on_location["obitos_novos"],text=df_data_on_location["obitos_novos"]))
+    fig6.update_traces(go.Scatter(x=df_data_on_acumulado["datahora"], y=df_data_on_acumulado["letalidade"]))
     return (
-        fig1, fig2, fig3, fig4
+        fig1, fig2, fig3, fig4, fig6
     )
 
 
