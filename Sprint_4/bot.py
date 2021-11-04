@@ -4,7 +4,7 @@ import pandas as pd
 #-----------------------#
 
 # t.me/Fluffyapi_bot   caminho para o bot
-CHAVE_API = "2068198957:AAFKYaIzYWW8pYmhB1_V5-TorX3pfp1xn7A"
+CHAVE_API = "2068198957:AAE0RSBrHRjZwKZ_870Xr08bQVMtajbjHbE"
 
 df = pd.read_csv("docs\df_estadotratado.csv")
 df_vs = pd.read_csv("docs\df_vacinastratado.csv")
@@ -28,28 +28,41 @@ deaths = row["obitos"].values[0]
 new_deaths = row["obitos_novos"].values[0]
 population = row["pop"].values[0]
 
+# Formatação Numerica
+form_cases = (f"{cases:_}")
+form_cases = form_cases.replace("_",".")
+form_ncases = (f"{new_cases:_}")
+form_ncases = form_ncases.replace("_",".")
+form_deaths = (f"{deaths:_}")
+form_deaths = form_deaths.replace("_",".")
+form_ndeaths = (f"{new_deaths:_}")
+form_ndeaths = form_ndeaths.replace("_",".")
+form_pop = (f"{population:_}")
+form_pop = form_pop.replace("_",".")
+form_vs = (f"{max_vs:_}")
+form_vs = form_vs.replace("_",".")
 
 bot = telebot.TeleBot(CHAVE_API)
 
 #obitos
 @bot.message_handler(commands=["obitos"])
 def obitos(mensagem):
-    bot.send_message(mensagem.chat.id, f"Dados do dia:  {lastDate}\n  \nÓbitos Totais:  {deaths}\n \nNovos óbitos:  {new_deaths}.\n------------------------------------------------------------------\n Para ver dados da Covid19: /dados\n Para ver dados sobre a população: /pop\n  Para ver sobre o projeto: /sobre. ")
+    bot.send_message(mensagem.chat.id, f"Dados do dia:  {lastDate}\n  \nÓbitos Totais:  {form_deaths}\n \nNovos óbitos:  {form_ndeaths}.\n------------------------------------------------------------------\n Para ver dados da Covid19: /dados\n Para ver dados sobre a população: /pop\n  Para ver sobre o projeto: /sobre. ")
 
 #imunizados
 @bot.message_handler(commands=["imunizados"])
 def imunizados(mensagem):
-    bot.send_message(mensagem.chat.id, f"Dados do dia:  {lastDate}\n  \n Atualmente foram imunizadas: {max_vs} pessoas.\n-----------------------------------------------------------------------\n Para ver dados da Covid19: /dados\n Para ver dados sobre a população: /pop\n  Para ver sobre o projeto: /sobre.")
+    bot.send_message(mensagem.chat.id, f"Dados do dia:  {lastDate}\n  \n Atualmente foram imunizadas: {form_vs} pessoas.\n-----------------------------------------------------------------------\n Para ver dados da Covid19: /dados\n Para ver dados sobre a população: /pop\n  Para ver sobre o projeto: /sobre.")
 
 #novos casos no periodo
 @bot.message_handler(commands=["casos"])
 def casos(mensagem):
-    bot.send_message(mensagem.chat.id, f"Dados do dia:  {lastDate}\n  \nCasos Totais:  {cases}\n \nNovos casos: {new_cases}\n---------------------------------------------------------------\n Para ver dados da Covid19: /dados\n Para ver dados sobre a população: /pop\n  Para ver sobre o projeto: /sobre.")
+    bot.send_message(mensagem.chat.id, f"Dados do dia:  {lastDate}\n  \nCasos Totais:  {form_cases}\n \nNovos casos: {form_ncases}\n---------------------------------------------------------------\n Para ver dados da Covid19: /dados\n Para ver dados sobre a população: /pop\n  Para ver sobre o projeto: /sobre.")
 
 #população do estado de SP
 @bot.message_handler(commands=["pop"])
 def casos(mensagem):
-    bot.send_message(mensagem.chat.id, f" Atualmente a população do estado de \nSão Paulo é de {population} pessoas.\n-----------------------------------------------------------------------\n Para ver dados da Covid19: /dados\n  Para ver sobre o projeto: /sobre.  ")
+    bot.send_message(mensagem.chat.id, f" Atualmente a população do estado de \nSão Paulo é de {form_pop} pessoas.\n-----------------------------------------------------------------------\n Para ver dados da Covid19: /dados\n  Para ver sobre o projeto: /sobre.  ")
 
 
 @bot.message_handler(commands=["dados"])
