@@ -161,6 +161,17 @@ fig6.update_layout(
     margin = dict(l=50, r=30, t=40, b=80),
     showlegend=False
 )
+# Grafico de Pizza letalidade
+colors2 = ['#db261f', '#1f1b18']
+fig7 = go.Figure()
+fig7.add_trace(go.Pie(values= df_vacinas["Total Doses Aplicadas"], labels=df_vacinas["Dose"],pull=[0, 0.05],hole=.3,marker=dict(colors=colors2)))
+fig7.update_layout(
+    title_text='<b>Letalidade',
+    font=dict(family='Gill Sans, sans-serif',size=12,color='#1f1b18'),
+    title_x = 0.5,
+    autosize=True,
+    margin = dict(l=230, r=140, t=40, b=40),
+)
 
 # ==================================================================
 # Layout
@@ -924,7 +935,49 @@ def display_graph(location, start_date, end_date):
     return (
         fig1, fig2, fig3, fig4, fig6
     )
+    # Grafico Pizza Letalidade
+@app.callback(
+    Output("mortes-graph2","figure"),
+    [
+    Input("location-dropdown","value"),
+    Input("datepicker-range", "start_date"),
+    Input("datepicker-range", "end_date")
+    ]
+)
+def display_letal(location,start_date,end_date):
+    df_tratado = pd.read_csv('docs/df_tratado.csv')
+    if not location:
+        df_tratado = df_tratado[df_tratado["datahora"]== end_date]
+        casos = df_tratado['casos'].sum()
+        obitos = df_tratado['obitos'].sum()
+        casosobitos = (casos - obitos)
+        labels = ['Casos que não vieram a óbito' , 'Casos que vieram a óbito']
+        values = [(casosobitos), (obitos)]
+    else:
+        df_tratado = df_tratado[df_tratado['nome_munic'] == location]
+        df_tratado = df_tratado[df_tratado['datahora'] == end_date]
 
+        casos = df_tratado['casos'].values[0]
+        obitos = df_tratado['obitos'].values[0]
+
+        df_data_letalidade = df_vacinas[df_vacinas['nome_munic'] == location]
+        casosobitos = casos - obitos
+
+        df_data_letalidade.loc[-1] = [location, 'Casos que vieram a óbito', obitos]
+        df_data_letalidade = df_data_letalidade.sort_index()
+        df_data_letalidade.index = df_data_letalidade.index + 1
+
+        df_data_letalidade.loc[-1] = [location, 'Casos que não vieram a óbito', casosobitos]
+        df_data_letalidade = df_data_letalidade.sort_index()
+        df_data_letalidade.index = df_data_letalidade.index + 1
+
+        df_data_letalidade = df_data_letalidade.query("Dose == 'Casos que vieram a óbito' | Dose == 'Casos que não vieram a óbito'")
+        values = df_data_letalidade['Total Doses Aplicadas']
+        labels = df_data_letalidade['Dose']
+    fig7.update_traces(go.Pie(values=values, labels=labels))
+    return (
+        fig7
+    )
 
 # Chamada do modal SOBRE
 @app.callback(
