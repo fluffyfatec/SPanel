@@ -92,7 +92,7 @@ def responder(mensagem):
     
     Qualquer outra opção não vai funcionar"""
     bot.reply_to(mensagem, texto)
-
+print("\n\n\033[32m-------Em execução-------\033[0;0m\n\n")
 bot.polling()
 
 
