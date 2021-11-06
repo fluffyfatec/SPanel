@@ -20,13 +20,18 @@ pd.options.mode.chained_assignment = None
 
 # ==================================================================
 # Pré processamentos
+# Leitura de CSVs
 df_tratado = pd.read_csv("docs/df_tratado.csv")
 df_vacinastratado = pd.read_csv("docs/df_vacinastratado.csv")
 df_estadotratado = pd.read_csv("docs/df_estadotratado.csv")
 df_vacinas = pd.read_csv("docs/vacinas.csv", sep=';')
 df_vacinas = df_vacinas.rename(
     columns={'Município': 'nome_munic'})
-list_municipios = sorted(df_tratado['nome_munic'].unique()) #formatação de municipios
+
+# Lista de municipios para dropdown
+list_municipios = sorted(df_tratado['nome_munic'].unique())
+
+# Pre Tabela
 date_column = df_tratado["datahora"]
 max = date_column.max()
 row = df_tratado.loc[df_tratado["datahora"] == max]
@@ -161,6 +166,7 @@ fig6.update_layout(
     margin = dict(l=50, r=30, t=40, b=80),
     showlegend=False
 )
+
 # Grafico de Pizza letalidade
 colors2 = ['#db261f', '#1f1b18']
 fig7 = go.Figure()
@@ -170,7 +176,7 @@ fig7.update_layout(
     font=dict(family='Gill Sans, sans-serif',size=12,color='#1f1b18'),
     title_x = 0.5,
     autosize=True,
-    margin = dict(l=230, r=140, t=40, b=40),
+    margin = dict(l=40, r=50, t=40, b=40),
 )
 
 # ==================================================================
@@ -347,9 +353,9 @@ app.layout = dbc.Container([
                                 html.H5("Fonte", style={"color": "#1f1b18", "font-weight": "bold","padding-top":"10px"}),
                                 html.A("https://www.saopaulo.sp.gov.br/planosp/simi/dados-abertos/", href='https://www.saopaulo.sp.gov.br/planosp/simi/dados-abertos/', target="_blank",className="bt-link"),
 
-                                html.Div([
-                                dbc.Button("ARQUIVO .CSV", id="btn_csv",className='bt_close_modal',color="danger",style={"margin-top":"15px"}),
-                                dcc.Download(id="download-dataframe-csv")])
+                                # html.Div([
+                                # dbc.Button("ARQUIVO .CSV", id="btn_csv",className='bt_close_modal',color="danger",style={"margin-top":"15px"}),
+                                # dcc.Download(id="download-dataframe-csv")])
                             ])],style={"background-color":"#f1f1f1"}),
                         dbc.ModalFooter([
                             dbc.Button(
@@ -550,7 +556,7 @@ app.layout = dbc.Container([
             ],className='cardsteste2',style={"margin-right": "5px"})
         ], md=3)
     ], style={"background-image": "linear-gradient(#1f1b18 50%, #f1f1f1 50%)"})
-    # Graficos
+    # Graficos - Imunizados
     ,dbc.Row([
         dbc.Col([
             dcc.Markdown(['''>
@@ -574,6 +580,7 @@ app.layout = dbc.Container([
             ],className="cardgraph2")
         ], md=6)
     ])
+    # Graficos - Casos Confirmados
     ,dbc.Row([
         dbc.Col([
             dcc.Markdown(['''>
@@ -597,6 +604,7 @@ app.layout = dbc.Container([
             ],className="cardgraph2")
         ], md=6)
     ])
+    # Graficos - Óbitos Confirmados
     ,dbc.Row([
         dbc.Col([
             dcc.Markdown(['''>
@@ -620,6 +628,7 @@ app.layout = dbc.Container([
             ],className="cardgraph2")
         ], md=6)
     ])
+    # Graficos - População
     ,dbc.Row([
         dbc.Col([
             dcc.Markdown(['''>
@@ -686,16 +695,16 @@ app.layout = dbc.Container([
                             style_data={"color": "#3B332D", 'font-family': 'Gill Sans, sans-serif',
                                         'border': '1px solid grey', 'whiteSpace': 'normal'},
                             style_data_conditional=[
-                                                       {
-                                                           'if': {
-                                                       'filter_query': '{Localização} contains "ESTADO DE SÃO PAULO"'
+                                {
+                                    'if': {
+                                        'filter_query': '{Localização} contains "ESTADO DE SÃO PAULO"'
 
-                                                           },
-                                                           'backgroundColor': '#E68B8B',
-                                                           'color': 'white'
-                                                       },
+                                    },
+                                    'backgroundColor': '#db261f',
+                                    'color': 'white'
+                                },
 
-                                                   ],
+                            ],
                             tooltip_delay=0,
                             tooltip_duration=None)
                         ])
@@ -815,7 +824,7 @@ def update_table(location):
 # Chamada graficos
 
 # ==================================================================
-# Grafico Card 1
+# Grafico Vacinas Aplicadas
 @app.callback(
     Output("vacinas-graph", "figure"),
     [
@@ -843,7 +852,8 @@ def display_vacinas(location):
         fig0
     )
 
-    # Vacinometro
+# ==================================================================
+# Grafico Vacinas Aplicadas
 @app.callback(
     Output("vacinas-graph2", "figure"),
     [
@@ -895,7 +905,7 @@ def display_imunizados(location):
 )
 
 # ==================================================================
-# Grafico Card 2 e 3
+# Grafico Casos, Obitos e Letalidade
 @app.callback(
     [
     Output("casos-graph","figure"),
@@ -935,7 +945,9 @@ def display_graph(location, start_date, end_date):
     return (
         fig1, fig2, fig3, fig4, fig6
     )
-    # Grafico Pizza Letalidade
+
+# ==================================================================
+# Grafico Letalidade Pizza
 @app.callback(
     Output("mortes-graph2","figure"),
     [
@@ -1034,14 +1046,15 @@ def toggle_accordion(n1, n2, n3, n4, is_open1, is_open2, is_open3, is_open4):
     return False, False, False
 
 # ==================================================================
-#Chamada do botão de download CSV
-@app.callback(
-    Output("download-dataframe-csv", "data"),
-    Input("btn_csv", "n_clicks"),
-    prevent_initial_call=True,
-)
-def func(n_clicks):
-    return dcc.send_data_frame(df_tratado.to_csv, "docs/df_tratado.csv")
+# #Chamada do botão de download CSV
+# @app.callback(
+#     Output("download-dataframe-csv", "data"),
+#     Input("btn_csv", "n_clicks"),
+#     prevent_initial_call=True,
+# )
+# def func(n_clicks):
+#     return dcc.send_data_frame(df_tratado.to_csv, "docs/df_tratado.csv",df_estadotratado)
+
 
 
 
