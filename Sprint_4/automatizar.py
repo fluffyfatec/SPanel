@@ -19,7 +19,7 @@ async def main():
         async with page.expect_download() as download_info:
             download = await download_info.value
             path = await download.path()
-            await download.save_as('Database_covid19.csv')
+            await download.save_as('Sprint_4/docs/df_state.csv')
             print(download.url, path)
             await page.close()
             await browser.close()          
@@ -39,7 +39,7 @@ async def main():
         async with page.expect_download() as download_info:
             download = await download_info.value
             path = await download.path()
-            await download.save_as('vacinas.csv')
+            await download.save_as('Sprint_4/docs/vacinas.csv')
             print(download.url, path)
             await page.close()
             await browser.close()            
