@@ -1,10 +1,11 @@
+# pip install pytelegrambotapi
 #------Bibliotecas------#
 import telebot
 import pandas as pd
 #-----------------------#
 
 # t.me/Fluffyapi_bot   caminho para o bot
-CHAVE_API = "2068198957:AAE0RSBrHRjZwKZ_870Xr08bQVMtajbjHbE"
+CHAVE_API = "2068198957:AAEhNM30vYaeERcwdcGoj9yoIX_wj-hoCaU"
 
 df = pd.read_csv("docs\df_estadotratado.csv")
 df_vs = pd.read_csv("docs\df_vacinastratado.csv")
@@ -95,6 +96,11 @@ def responder(mensagem):
 print("\n\n\033[32m-------Em execução-------\033[0;0m\n\n")
 bot.polling()
 
+
+
+
+
+    
 
 
 
