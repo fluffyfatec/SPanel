@@ -73,5 +73,5 @@ df_estadotratado.to_csv("docs/df_estadotratado.csv")
 df_regiao_tratado = pd.read_csv("docs/df_regiao.csv", sep=';')
 df_regiao_tratado = df_regiao_tratado.drop(
     columns= [ 'pacientes_uti_mm7d','total_covid_uti_mm7d','internacoes_7d_l','internacoes_7v7', 'pacientes_uti_ultimo_dia',
-        'pacientes_enf_mm7d','total_covid_enf_mm7d','pacientes_enf_ultimo_dia','total_covid_enf_ultimo_dia'])
+        'pacientes_enf_mm7d','total_covid_enf_mm7d','pacientes_enf_ultimo_dia','total_covid_enf_ultimo_dia', 'leitos_pc'])
 df_regiao_tratado.to_csv("docs/df_regiao_tratado.csv")
