@@ -29,10 +29,10 @@ df_estadotratado = pd.read_csv("docs/df_estadotratado.csv")
 df_vacinas = pd.read_csv("docs/vacinas.csv", sep=';')
 df_vacinas = df_vacinas.rename(
     columns={'Município': 'nome_munic'})
-
+df_regiao_tratado = pd.read_csv("docs/df_regiao_tratado.csv")
 # Lista de municipios para dropdown
 list_municipios = sorted(df_tratado['nome_munic'].unique())
-
+list_drs = sorted(df_regiao_tratado['nome_drs'].unique())
 # Pre Tabela
 date_column = df_tratado["datahora"]
 max = date_column.max()
@@ -66,7 +66,8 @@ list_municipios2 = sorted(df_tratado_rename['Localização'].unique())
 fig0 = go.Figure()
 fig0.add_trace(go.Bar(x=df_vacinas["Total Doses Aplicadas"], y=df_vacinas["Dose"],text=df_vacinas["Total Doses Aplicadas"],marker_color='#db261f',orientation='h'),)
 fig0.update_layout(
-    yaxis=dict(showline=True,showticklabels=True,linewidth=2,linecolor='rgb(204, 204, 204)'),
+    yaxis=dict(showline=True,showticklabels=True,
+    linecolor='rgb(204, 204, 204)'),
     xaxis=dict(ticks="outside",gridcolor='#f1f1f1',showline=True,showticklabels=True,linewidth=2,linecolor='rgb(204, 204, 204)'),
     title='<b>Vacinas Aplicadas',
     font=dict(family='Gill Sans, sans-serif',size=12,color='#1f1b18'),
@@ -181,6 +182,17 @@ fig7.update_layout(
     margin = dict(l=40, r=50, t=40, b=40),
 )
 
+#grafico regiões
+colors = ['#1f1b18','#db261f']
+fig8 = go.Figure()
+fig8.add_trace(go.Pie(values= df_vacinas["Total Doses Aplicadas"], labels=df_vacinas["Dose"],pull=[0, 0.05],hole=.3,marker=dict(colors=colors2)))
+fig8.update_layout(
+    title_text='<b>regioes',
+    font=dict(family='Gill Sans, sans-serif',size=12,color='#1f1b18'),
+    title_x = 0.5,
+    autosize=True,
+    margin = dict(l=40, r=50, t=40, b=40),
+)
 # ==================================================================
 # Layout
 app = dash.Dash(__name__, external_stylesheets=[dbc.themes.SANDSTONE],title='SPanel | COVID-19',update_title="Iniciando...")
@@ -718,7 +730,7 @@ app.layout = dbc.Container([
     , dbc.Row([
         dbc.Col([
             dcc.Markdown(['''>
-  > Departamentos Regionais de Saúde
+  > Outros Dados
   >'''], className="lb_imunizados", style={'margin-top': '40px', 'margin-left': '10px'})
         ])
     ])
@@ -726,33 +738,48 @@ app.layout = dbc.Container([
         dbc.Col([
              html.Div(
                 [
-                    dbc.Button("Grande São Paulo", id="open-xl", n_clicks=0, style={'margin-top': '20px', 'margin-left':'25px'}, className='bt_departamentos'),
-                    dbc.Button("Araçatuba", id="open-xl1", n_clicks=0, style={'margin-top': '20px', 'margin-left':'25px'}, className='bt_departamentos'),
-                    dbc.Button("Araraquara", id="open-xl2", n_clicks=0, style={'margin-top': '20px', 'margin-left': '25px'}, className='bt_departamentos'),
-                    dbc.Button("Baixada Santista", id="open-xl3", n_clicks=0, style={'margin-top': '20px', 'margin-left':'25px'}, className='bt_departamentos'),
-                    dbc.Button("Barretos", id="open-xl4", n_clicks=0, style={'margin-top': '20px', 'margin-left': '25px'}, className='bt_departamentos'),
-                    dbc.Button("Bauru", id="open-xl5", n_clicks=0, style={'margin-top': '20px', 'margin-left': '25px'}, className='bt_departamentos'),
-                    dbc.Button("Campinas", id="open-xl6", n_clicks=0, style={'margin-top': '20px', 'margin-left': '25px'}, className='bt_departamentos'),
-                    dbc.Button("Franca", id="open-xl7", n_clicks=0, style={'margin-top': '20px', 'margin-left': '25px'}, className='bt_departamentos'),
-                    dbc.Button("Marília", id="open-xl8", n_clicks=0, style={'margin-top': '20px', 'margin-left': '25px'}, className='bt_departamentos'),
-                    dbc.Button("Piracicaba", id="open-xl9", n_clicks=0, style={'margin-top': '20px', 'margin-left': '25px'}, className='bt_departamentos'),
-                    dbc.Button("Presidente Prudente", id="open-xl10", n_clicks=0, style={'margin-top': '20px', 'margin-left': '25px'}, className='bt_departamentos'),
-                    dbc.Button("Registro", id="open-xl11", n_clicks=0, style={'margin-top': '20px', 'margin-left': '25px'}, className='bt_departamentos'),
-                    dbc.Button("Ribeirão Preto", id="open-xl12", n_clicks=0, style={'margin-top': '20px', 'margin-left': '25px'}, className='bt_departamentos'),
-                    dbc.Button("São João da Boa Vista", id="open-xl13", n_clicks=0, style={'margin-top': '20px', 'margin-left': '25px'}, className='bt_departamentos'),
-                    dbc.Button("São José do Rio Preto", id="open-xl14", n_clicks=0, style={'margin-top': '20px', 'margin-left': '25px'}, className='bt_departamentos'),
-                    dbc.Button("Sorocaba", id="open-xl15", n_clicks=0, style={'margin-top': '20px', 'margin-left': '25px'}, className='bt_departamentos'),
-                    dbc.Button("Taubaté", id="open-xl16", n_clicks=0, style={'margin-top': '20px', 'margin-left': '25px'}, className='bt_departamentos'),
-                    dbc.Button("Estado de São Paulo", id="open-xl17", n_clicks=0, style={'margin-top': '20px', 'margin-left': '25px'}, className='bt_departamentos'),
+                    dbc.Button("D - Regionais de Saúde", id="open-xl", n_clicks=0, style={'margin-top': '20px', 'margin-left':'25px'}, className='bt_departamentos'),
+                    dbc.Button("Transparencia ", id="open-xl1", n_clicks=0, style={'margin-top': '20px', 'margin-left':'25px'}, className='bt_departamentos'),
 
 
                     dbc.Modal(
                         [
-                            dbc.ModalHeader("DRS I - Grande São Paulo",
+                            dbc.ModalHeader("Departamentos Regionais de Saúde",
                                             style={"color": "#1f1b18", "font-weight": "bold",
-                                                   "background-color": "#f1f1f1"}),
-                            dbc.ModalBody(html.Img(id="taubate", src="assets/taubate.png", width=200, style={"margin-top": "-10px"}),
-                                          ),
+                                                   "background-color": "#f1f1f1"})
+                            ,dbc.ModalBody(
+                                dbc.Row([
+                                    dbc.Col([
+                                         dbc.Card([
+                                            dbc.CardBody([
+                                                 dcc.Dropdown(
+                                                    id='demo-reg', className="location-dropdown",
+                                                    options=[{"label": i, "value": i} for i in list_drs],
+                                                    persistence="ESTADO DE SÃO PAULO",
+                                                    placeholder="Escolha uma localidade",
+                                                    clearable=True),
+                                            ])
+                                        ]),
+
+                                    ],md=3),
+                                    dbc.Col([
+                                       dbc.Row([html.Img(id="TESTEMAPA", src="assets/mapas/Grande-São-Paulo.png", width=450,className='img')
+                                       ]),
+                                    ],md=5),
+                                    dbc.Col([
+                                       dbc.Row(['GRAF 1'
+                                       ]),
+                                       dbc.Row(['GRAF 2'
+                                       ]),
+                                       dbc.Row(['CARD 1'
+                                       ]),
+                                       dbc.Row(['CARD 2'
+                                       ]),
+                                       dbc.Row(['CARD 3'
+                                       ]),
+                                    ],md=4),
+                                ])
+                            ),
                         ],
                         id="modal-xl",
                         size="xl",
@@ -760,7 +787,7 @@ app.layout = dbc.Container([
                     ),
                     dbc.Modal(
                         [
-                            dbc.ModalHeader("DRS II - Araçatuba",
+                            dbc.ModalHeader("Transparência ",
                                             style={"color": "#1f1b18", "font-weight": "bold",
                                                    "background-color": "#f1f1f1"}),
                             dbc.ModalBody("An extra large modal."),
@@ -768,166 +795,7 @@ app.layout = dbc.Container([
                         id="modal-xl1",
                         size="xl",
                         is_open=False,
-                    ),
-                    dbc.Modal(
-                        [
-                            dbc.ModalHeader("DRS III - Araraquara",
-                                style={"color": "#1f1b18", "font-weight": "bold", "background-color": "#f1f1f1"}),
-                            dbc.ModalBody("An extra large modal."),
-                        ],
-                        id="modal-xl2",
-                        size="xl",
-                        is_open=False,
-                    ),
-                    dbc.Modal(
-                        [
-                            dbc.ModalHeader("DRS IV - Baixada Santista",
-                                style={"color": "#1f1b18", "font-weight": "bold", "background-color": "#f1f1f1"}),
-                            dbc.ModalBody("An extra large modal."),
-                        ],
-                        id="modal-xl3",
-                        size="xl",
-                        is_open=False,
-                    ),
-                    dbc.Modal(
-                        [
-                            dbc.ModalHeader("DRS V - Barretos",
-                                style={"color": "#1f1b18", "font-weight": "bold", "background-color": "#f1f1f1"}),
-                            dbc.ModalBody("An extra large modal."),
-                        ],
-                        id="modal-xl4",
-                        size="xl",
-                        is_open=False,
-                    ),
-                        dbc.Modal(
-                        [
-                            dbc.ModalHeader("DRS VI - Bauru",
-                                style={"color": "#1f1b18", "font-weight": "bold", "background-color": "#f1f1f1"}),
-                            dbc.ModalBody("An extra large modal."),
-                        ],
-                        id="modal-xl5",
-                        size="xl",
-                        is_open=False,
-                    ),
-                        dbc.Modal(
-                        [
-                            dbc.ModalHeader("DRS VII - Campinas",
-                                style={"color": "#1f1b18", "font-weight": "bold", "background-color": "#f1f1f1"}),
-                            dbc.ModalBody("An extra large modal."),
-                        ],
-                        id="modal-xl6",
-                        size="xl",
-                        is_open=False,
-                    ),
-                        dbc.Modal(
-                        [
-                            dbc.ModalHeader("DRS VIII - Franca",
-                                style={"color": "#1f1b18", "font-weight": "bold", "background-color": "#f1f1f1"}),
-                            dbc.ModalBody("An extra large modal."),
-                        ],
-                        id="modal-xl7",
-                        size="xl",
-                        is_open=False,
-                    ),
-                        dbc.Modal(
-                        [
-                            dbc.ModalHeader("DRS IX - Marília",
-                                style={"color": "#1f1b18", "font-weight": "bold", "background-color": "#f1f1f1"}),
-                            dbc.ModalBody("An extra large modal."),
-                        ],
-                        id="modal-xl8",
-                        size="xl",
-                        is_open=False,
-                    ),
-                        dbc.Modal(
-                        [
-                            dbc.ModalHeader("DRS X - Piracicaba",
-                                style={"color": "#1f1b18", "font-weight": "bold", "background-color": "#f1f1f1"}),
-                            dbc.ModalBody("An extra large modal."),
-                        ],
-                        id="modal-xl9",
-                        size="xl",
-                        is_open=False,
-                    ),
-                        dbc.Modal(
-                        [
-                            dbc.ModalHeader("DRS XI - Presidente Prudente",
-                                style={"color": "#1f1b18", "font-weight": "bold", "background-color": "#f1f1f1"}),
-                            dbc.ModalBody("An extra large modal."),
-                        ],
-                        id="modal-xl10",
-                        size="xl",
-                        is_open=False,
-                    ),
-                        dbc.Modal(
-                        [
-                            dbc.ModalHeader("DRS XII - Registro",
-                                style={"color": "#1f1b18", "font-weight": "bold", "background-color": "#f1f1f1"}),
-                            dbc.ModalBody("An extra large modal."),
-                        ],
-                        id="modal-xl11",
-                        size="xl",
-                        is_open=False,
-                    ),
-                        dbc.Modal(
-                        [
-                            dbc.ModalHeader("DRS XIII - Ribeirão Preto",
-                                style={"color": "#1f1b18", "font-weight": "bold", "background-color": "#f1f1f1"}),
-                            dbc.ModalBody("An extra large modal."),
-                        ],
-                        id="modal-xl12",
-                        size="xl",
-                        is_open=False,
-                    ),
-                        dbc.Modal(
-                        [
-                            dbc.ModalHeader("DRS XIV - São João da Boa Vista",
-                                style={"color": "#1f1b18", "font-weight": "bold", "background-color": "#f1f1f1"}),
-                            dbc.ModalBody("An extra large modal."),
-                        ],
-                        id="modal-xl13",
-                        size="xl",
-                        is_open=False,
-                    ),
-                        dbc.Modal(
-                        [
-                            dbc.ModalHeader("DRS XV - São José do Rio Preto",
-                                style={"color": "#1f1b18", "font-weight": "bold", "background-color": "#f1f1f1"}),
-                            dbc.ModalBody("An extra large modal."),
-                        ],
-                        id="modal-xl14",
-                        size="xl",
-                        is_open=False,
-                    ),
-                        dbc.Modal(
-                        [
-                            dbc.ModalHeader("DRS XVI - Sorocaba",
-                                style={"color": "#1f1b18", "font-weight": "bold", "background-color": "#f1f1f1"}),
-                            dbc.ModalBody("An extra large modal."),
-                        ],
-                        id="modal-xl15",
-                        size="xl",
-                        is_open=False,
-                    ),
-                        dbc.Modal(
-                        [
-                            dbc.ModalHeader("DRS XVII - Taubaté",
-                                style={"color": "#1f1b18", "font-weight": "bold", "background-color": "#f1f1f1"}),
-                            dbc.ModalBody("An extra large modal."),
-                        ],
-                        id="modal-xl16",
-                        size="xl",
-                        is_open=False,
-                    ),
-                        dbc.Modal(
-                        [
-                            dbc.ModalHeader("Estado de São Paulo",
-                                style={"color": "#1f1b18", "font-weight": "bold", "background-color": "#f1f1f1"}),
-                            dbc.ModalBody("An extra large modal."),
-                        ],
-                        id="modal-xl17",
-                        size="xl",
-                        is_open=False,
+
                     ),
                 ]
             ),
@@ -1268,6 +1136,9 @@ def toggle_accordion(n1, n2, n3, n4, is_open1, is_open2, is_open3, is_open4):
     elif button_id == "group-4-toggle" and n4:
         return False, False, False, not is_open4
     return False, False, False
+#callback drs
+
+
 #================= Callback modal macro=================================================
 def toggle_modal(n1, is_open):
     if n1:
@@ -1279,91 +1150,15 @@ app.callback(
     Input("open-xl", "n_clicks"),
     State("modal-xl", "is_open"),
 )(toggle_modal)
+
 app.callback(
     Output("modal-xl1", "is_open"),
     Input("open-xl1", "n_clicks"),
     State("modal-xl1", "is_open"),
 )(toggle_modal)
-app.callback(
-    Output("modal-xl2", "is_open"),
-    Input("open-xl2", "n_clicks"),
-    State("modal-xl2", "is_open"),
-)(toggle_modal)
-app.callback(
-    Output("modal-xl3", "is_open"),
-    Input("open-xl3", "n_clicks"),
-    State("modal-xl3", "is_open"),
-)(toggle_modal)
-app.callback(
-    Output("modal-xl4", "is_open"),
-    Input("open-xl4", "n_clicks"),
-    State("modal-xl4", "is_open"),
-)(toggle_modal)
-app.callback(
-    Output("modal-xl5", "is_open"),
-    Input("open-xl5", "n_clicks"),
-    State("modal-xl5", "is_open"),
-)(toggle_modal)
-app.callback(
-    Output("modal-xl6", "is_open"),
-    Input("open-xl6", "n_clicks"),
-    State("modal-xl6", "is_open"),
-)(toggle_modal)
-app.callback(
-    Output("modal-xl7", "is_open"),
-    Input("open-xl7", "n_clicks"),
-    State("modal-xl7", "is_open"),
-)(toggle_modal)
-app.callback(
-    Output("modal-xl8", "is_open"),
-    Input("open-xl8", "n_clicks"),
-    State("modal-xl8", "is_open"),
-)(toggle_modal)
-app.callback(
-    Output("modal-xl9", "is_open"),
-    Input("open-xl9", "n_clicks"),
-    State("modal-xl9", "is_open"),
-)(toggle_modal)
-app.callback(
-    Output("modal-xl10", "is_open"),
-    Input("open-xl10", "n_clicks"),
-    State("modal-xl10", "is_open"),
-)(toggle_modal)
-app.callback(
-    Output("modal-xl11", "is_open"),
-    Input("open-xl11", "n_clicks"),
-    State("modal-xl11", "is_open"),
-)(toggle_modal)
-app.callback(
-    Output("modal-xl12", "is_open"),
-    Input("open-xl12", "n_clicks"),
-    State("modal-xl12", "is_open"),
-)(toggle_modal)
-app.callback(
-    Output("modal-xl13", "is_open"),
-    Input("open-xl13", "n_clicks"),
-    State("modal-xl13", "is_open"),
-)(toggle_modal)
-app.callback(
-    Output("modal-xl14", "is_open"),
-    Input("open-xl14", "n_clicks"),
-    State("modal-xl14", "is_open"),
-)(toggle_modal)
-app.callback(
-    Output("modal-xl15", "is_open"),
-    Input("open-xl15", "n_clicks"),
-    State("modal-xl15", "is_open"),
-)(toggle_modal)
-app.callback(
-    Output("modal-xl16", "is_open"),
-    Input("open-xl16", "n_clicks"),
-    State("modal-xl16", "is_open"),
-)(toggle_modal)
-app.callback(
-    Output("modal-xl17", "is_open"),
-    Input("open-xl17", "n_clicks"),
-    State("modal-xl17", "is_open"),
-)(toggle_modal)
+
+
+
 # ==================================================================
 # #Chamada do botão de download CSV
 # @app.callback(
