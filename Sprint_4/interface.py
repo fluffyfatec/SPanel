@@ -739,44 +739,108 @@ app.layout = dbc.Container([
              html.Div(
                 [
                     dbc.Button("D - Regionais de Saúde", id="open-xl", n_clicks=0, style={'margin-top': '20px', 'margin-left':'25px'}, className='bt_departamentos'),
-                    dbc.Button("Transparencia ", id="open-xl1", n_clicks=0, style={'margin-top': '20px', 'margin-left':'25px'}, className='bt_departamentos'),
+                    dbc.Button("Transparencia ", id="open-xl1", n_clicks=0, style={'margin-top': '20px', 'margin-left':'25px'},className='bt_departamentos'),
 
 
                     dbc.Modal(
                         [
                             dbc.ModalHeader("Departamentos Regionais de Saúde",
+
                                             style={"color": "#1f1b18", "font-weight": "bold",
                                                    "background-color": "#f1f1f1"})
                             ,dbc.ModalBody(
                                 dbc.Row([
                                     dbc.Col([
-                                         dbc.Card([
                                             dbc.CardBody([
                                                  dcc.Dropdown(
-                                                    id='demo-reg', className="location-dropdown",
+                                                    id='demo-reg', className="demo-dropdown",
                                                     options=[{"label": i, "value": i} for i in list_drs],
-                                                    persistence="ESTADO DE SÃO PAULO",
+                                                    value="Estado de São Paulo",
                                                     placeholder="Escolha uma localidade",
                                                     clearable=True),
-                                            ])
+                                            ]),
+                                        dbc.Row([
+                                            dbc.Button(
+                                                "Cidades da Região",
+                                                id="focus-target",
+                                                color="danger",
+                                                className="cidade-drs",
+                                                n_clicks=0
+                                            ),
+                                            dbc.Popover(
+                                                dbc.PopoverBody([html.H6("Cidades do DRS",style={"font-weight": "bold"}),
+                                                    html.H6("----------------------------------------------------")
+                                                 ]),
+                                                id="focus",
+                                                target="focus-target",
+                                                trigger="focus",
+                                            ),
+
                                         ]),
 
                                     ],md=3),
-                                    dbc.Col([
-                                       dbc.Row([html.Img(id="TESTEMAPA", src="assets/mapas/Grande-São-Paulo.png", width=450,className='img')
-                                       ]),
-                                    ],md=5),
-                                    dbc.Col([
-                                       dbc.Row(['GRAF 1'
-                                       ]),
-                                       dbc.Row(['GRAF 2'
-                                       ]),
-                                       dbc.Row(['CARD 1'
-                                       ]),
-                                       dbc.Row(['CARD 2'
-                                       ]),
-                                       dbc.Row(['CARD 3'
-                                       ]),
+
+                                        dbc.Col([
+                                            dbc.Row([
+                                                dbc.Card([
+                                                    dbc.CardBody([
+                                                        dcc.Graph()
+                                                    ])
+                                                ], className="cardgraph-drs")
+                                            ]),
+                                        ],md=4),
+                                        dbc.Col([
+                                            dbc.Row([
+                                                dbc.Card([
+                                                    dbc.CardBody([
+                                                        dcc.Graph()
+                                                    ])
+                                                ], className="cardgraph-drs")
+                                            ]),
+                                            dbc.Card([
+                                                dbc.CardBody([
+                                                    dbc.Row([
+                                                        dbc.Col([
+                                                            html.H5("Ocupação de leitos em %", style={"color": "#f1f1f1"}),
+                                                            html.H1(style={"color": "#f1f1f1"},
+                                                                    id="ocupacao_leitos")
+                                            ]), ]), ]),
+                                            dbc.Card([
+                                                 dbc.Row([
+                                                    dbc.Col([
+                                                        html.H5("População", style={"color": "#f1f1f1"}),
+                                                        html.H1(style={"color": "#f1f1f1"},
+                                                                id="pop")
+                                            ]), ]), ]),
+                                            dbc.Card([
+                                                dbc.Row([
+                                                    dbc.Col([
+                                                        html.H5("Internações nos últimos 7 dias", style={"color": "#f1f1f1"}),
+                                                        html.H1(style={"color": "#3B332D"},
+                                                                id="internacoes_7d")
+                                            ]), ]), ]),
+                                            dbc.Card([
+                                                dbc.Row([
+                                                    dbc.Col([
+                                                        html.H5("Leitos de UTI para a COVID", style={"color": "#f1f1f1"}),
+                                                        html.H1(style={"color": "#f1f1f1"},
+                                                                id="total_covid_uti_ultimo_dia")
+                                            ]), ]), ]),
+                                            dbc.Card([
+                                                dbc.Row([
+                                                    dbc.Col([
+                                                        html.H5("Ocupação de leitos", style={"color": "#f1f1f1"}),
+                                                        html.H1(style={"color": "#f1f1f1"},
+                                                                id="ocupacao_leitos_ultimo_dia")
+                                            ]), ]), ]),
+                                            dbc.Card([
+                                                dbc.Row([
+                                                    dbc.Col([
+                                                        html.H5("Internações confirmadas ou com suspeita de Covid", style={"color": "#f1f1f1"}),
+                                                        html.H1(style={"color": "#f1f1f1"},
+                                                                id="internacoes_ultimo_dia")
+                                                    ]),
+                                        ]), ]), ]),
                                     ],md=4),
                                 ])
                             ),
@@ -784,6 +848,7 @@ app.layout = dbc.Container([
                         id="modal-xl",
                         size="xl",
                         is_open=False,
+                        scrollable=True,
                     ),
                     dbc.Modal(
                         [
@@ -795,6 +860,7 @@ app.layout = dbc.Container([
                         id="modal-xl1",
                         size="xl",
                         is_open=False,
+
 
                     ),
                 ]
@@ -1136,26 +1202,67 @@ def toggle_accordion(n1, n2, n3, n4, is_open1, is_open2, is_open3, is_open4):
     elif button_id == "group-4-toggle" and n4:
         return False, False, False, not is_open4
     return False, False, False
-#callback drs
+#==============================
+@app.callback(
+    [
+        Output("ocupacao_leitos", "children"),
+        Output("pop", "children"),
+        Output("internacoes_7d", "children"),
+        Output("total_covid_uti_ultimo_dia", "children"),
+        Output("ocupacao_leitos_ultimo_dia", "children"),
+        Output("internacoes_ultimo_dia", "children"),
+    ],
+    Input("demo-reg", "value"),
+)
+def display_status(location):
+    df_regiao_tratado=pd.read_csv('docs/df_regiao_tratado.csv')
+    if not location:
+        pass
+    else:
+        df_data_regiao=df_regiao_tratado[df_regiao_tratado["nome_drs"]==location]
+        end_date=df_data_regiao["datahora"].max()
+        df_data_regiao = df_data_regiao[df_data_regiao["datahora"] == end_date]
+
+    leito = "-" if df_data_regiao["ocupacao_leitos"].isna().values[0] else (df_data_regiao["ocupacao_leitos"].values[0])
+    pop = "-" if df_data_regiao["pop"].isna().values[0] else f'{int(df_data_regiao["pop"].values[0]):,}'.replace(",", ".")
+    internacoes = "-" if df_data_regiao["internacoes_7d"].isna().values[0] else f'{int(df_data_regiao["internacoes_7d"].values[0]):,}'.replace(",", ".")
+    coviduti= "-" if df_data_regiao["total_covid_uti_ultimo_dia"].isna().values[0] else f'{int(df_data_regiao["total_covid_uti_ultimo_dia"].values[0]):,}'.replace(",", ".")
+    ocupacao= "-" if df_data_regiao["ocupacao_leitos_ultimo_dia"].isna().values[0] else (df_data_regiao["ocupacao_leitos_ultimo_dia"].values[0])
+    ultimodia= "-" if df_data_regiao["internacoes_ultimo_dia"].isna().values[0] else f'{int(df_data_regiao["internacoes_ultimo_dia"].values[0]):,}'.replace(",", ".")
+
+    return(f'{leito}%',
+           pop,
+           internacoes,
+           coviduti,
+           f'{ocupacao}%',
+           ultimodia)
+
 
 
 #================= Callback modal macro=================================================
+
+@app.callback(
+    Output("modal-xl", "is_open"),
+    [Input("open-xl", "n_clicks")],
+    [State("modal-xl", "is_open")],
+)
+def toggle_modal(n1, is_open):
+    if n1:
+        return not is_open
+    return is_open
+@app.callback(
+    Output("modal-xl1", "is_open"),
+    [Input("open-xl1", "n_clicks")],
+    [State("modal-xl1", "is_open")],
+)
 def toggle_modal(n1, is_open):
     if n1:
         return not is_open
     return is_open
 
-app.callback(
-    Output("modal-xl", "is_open"),
-    Input("open-xl", "n_clicks"),
-    State("modal-xl", "is_open"),
-)(toggle_modal)
 
-app.callback(
-    Output("modal-xl1", "is_open"),
-    Input("open-xl1", "n_clicks"),
-    State("modal-xl1", "is_open"),
-)(toggle_modal)
+
+
 
 
 
