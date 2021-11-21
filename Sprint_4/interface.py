@@ -183,11 +183,18 @@ fig7.update_layout(
 )
 
 #grafico regiões
-colors = ['#1f1b18','#db261f']
+
 fig8 = go.Figure()
-fig8.add_trace(go.Pie(values= df_vacinas["Total Doses Aplicadas"], labels=df_vacinas["Dose"],pull=[0, 0.05],hole=.3,marker=dict(colors=colors2)))
 fig8.update_layout(
-    title_text='<b>regioes',
+    title_text='<b> % de leitos ocupados nos ultimos 7 dias',
+    font=dict(family='Gill Sans, sans-serif',size=12,color='#1f1b18'),
+    title_x = 0.5,
+    autosize=True,
+    margin = dict(l=40, r=50, t=40, b=40),
+)
+fig9 = go.Figure()
+fig9.update_layout(
+    title_text='<b> % de leitos ocupados no ultimo dia',
     font=dict(family='Gill Sans, sans-serif',size=12,color='#1f1b18'),
     title_x = 0.5,
     autosize=True,
@@ -757,7 +764,7 @@ app.layout = dbc.Container([
                                                     options=[{"label": i, "value": i} for i in list_drs],
                                                     value="Estado de São Paulo",
                                                     placeholder="Escolha uma localidade",
-                                                    clearable=True),
+                                                    clearable=False),
                                             ]),
                                         dbc.Row([
                                             dbc.Button(
@@ -784,16 +791,16 @@ app.layout = dbc.Container([
                                             dbc.Row([
                                                 dbc.Card([
                                                     dbc.CardBody([
-                                                        dcc.Graph()
+                                                        dcc.Graph(id="cardgraph-drs1", className='graph1')
                                                     ])
-                                                ], className="cardgraph-drs")
+                                                ], className="cardgraph-drs1")
                                             ]),
                                         ],md=4),
                                         dbc.Col([
                                             dbc.Row([
                                                 dbc.Card([
                                                     dbc.CardBody([
-                                                        dcc.Graph()
+                                                        dcc.Graph(id="cardgraph-drs", className='graph1')
                                                     ])
                                                 ], className="cardgraph-drs")
                                             ]),
@@ -1237,8 +1244,65 @@ def display_status(location):
            f'{ocupacao}%',
            ultimodia)
 
+@app.callback(
+     Output("cardgraph-drs", "figure"),
 
+     Input("demo-reg", "value")
+)
 
+def display_ocupacao(location):
+     if not location:
+         df_data_regiao = df_regiao_tratado[df_regiao_tratado['nome_drs'] == 'Estado de São Paulo']
+         end_date = df_data_regiao["datahora"].max()
+         df_data_regiao = df_data_regiao[df_data_regiao['datahora'] == end_date]
+         ocup_leito = df_data_regiao['ocupacao_leitos'].values[0].replace(',','.')
+         ocup_leito = float(ocup_leito)
+         desocup_leito = 100 - ocup_leito
+         labels = ['Leitos Ocupados', 'Leitos Desocupados']
+         values = [(ocup_leito), (desocup_leito)]
+     else:
+         df_data_regiao = df_regiao_tratado[df_regiao_tratado['nome_drs'] == location]
+         end_date = df_data_regiao["datahora"].max()
+         df_data_regiao = df_data_regiao[df_data_regiao['datahora'] == end_date]
+         ocup_leito = df_data_regiao['ocupacao_leitos'].values[0].replace(',','.')
+         ocup_leito = float(ocup_leito)
+         desocup_leito = 100 - ocup_leito
+         labels = ['Leitos Ocupados', 'Leitos Desocupados']
+         values = [(ocup_leito), (desocup_leito)]
+     fig8.add_trace(go.Pie(values=values, labels=labels))
+     fig8.update_traces(go.Pie(values=values, labels=labels))
+     return (
+         fig8
+     )
+@app.callback(
+     Output("cardgraph-drs1", "figure"),
+     Input("demo-reg", "value")
+)
+
+def display_ocupacao(location):
+     if not location:
+         df_data_regiao = df_regiao_tratado[df_regiao_tratado['nome_drs'] == 'Estado de São Paulo']
+         end_date = df_data_regiao["datahora"].max()
+         df_data_regiao = df_data_regiao[df_data_regiao['datahora'] == end_date]
+         ocup_leito_ultimo = df_data_regiao['ocupacao_leitos_ultimo_dia'].values[0].replace(',','.')
+         ocup_leito_ultimo = float(ocup_leito_ultimo)
+         desocup_leito_ultimo = 100 - ocup_leito_ultimo
+         labels = ['Leitos Ocupados', 'Leitos Desocupados']
+         values = [(ocup_leito_ultimo), (desocup_leito_ultimo)]
+     else:
+         df_data_regiao = df_regiao_tratado[df_regiao_tratado['nome_drs'] == location]
+         end_date = df_data_regiao["datahora"].max()
+         df_data_regiao = df_data_regiao[df_data_regiao['datahora'] == end_date]
+         ocup_leito_ultimo = df_data_regiao['ocupacao_leitos_ultimo_dia'].values[0].replace(',','.')
+         ocup_leito_ultimo = float(ocup_leito_ultimo)
+         desocup_leito_ultimo = 100 - ocup_leito_ultimo
+         labels = ['Leitos Ocupados', 'Leitos Desocupados']
+         values = [(ocup_leito_ultimo), (desocup_leito_ultimo)]
+     fig9.add_trace(go.Pie(values=values, labels=labels))
+     fig9.update_traces(go.Pie(values=values, labels=labels))
+     return (
+         fig9
+     )
 #================= Callback modal macro=================================================
 
 @app.callback(
@@ -1259,12 +1323,6 @@ def toggle_modal(n1, is_open):
     if n1:
         return not is_open
     return is_open
-
-
-
-
-
-
 
 # ==================================================================
 # #Chamada do botão de download CSV
