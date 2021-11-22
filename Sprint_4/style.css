@@ -66,6 +66,14 @@ p{
 }
 
 /* Cards ---------------------------------------------*/
+.cardsdep{
+  background: linear-gradient(#1F1B18, #2B2621);
+  border-radius: 20px;
+  margin-top : 10px;
+  width: 100%;
+  /* box-shadow: 0.1em 0.1em 0.5em #141210;*/
+}
+
 .cards{
   border-style: none;
   border-radius: 20px;
@@ -175,13 +183,6 @@ blockquote {
   text-decoration:none
  }
 
-.bt_departamentos{
-   width:138px;
-   background-color:#db261f;
-   border-radius:10px;
-   font-size:9px;
- }
-
 /* Forms –––––––––––––––––––––––––––––––––––––––––––––––––– */
 input[className="location-dropdown"],input[type="email"], input[type="number"], input[type="search"], input[type="text"], input[type="tel"], input[type="url"], input[type="password"], textarea, select {
   height: 36.5px;
@@ -269,6 +270,50 @@ input[className="location-dropdown"],input[type="email"], input[type="number"], 
   color: white;
 }
 
+/* Dropdown Cidades Tabela ---------------------------------------------*/
+.reg-dropdown .Select-control, .reg-dropdown .Select-menu-outer, .reg-dropdown .Select-multi-value-wrapper, .reg-dropdown .select-up, .reg-dropdown .is-open .reg-dropdown .Select-control {
+  color: #1f1b18;
+}
+
+.reg-dropdown .Select-control{
+  height: 35px;
+  width: 100%;
+  border: 2px solid #1F1B18;
+  margin-top: 10px;
+}
+
+.reg-dropdown .VirtualizedSelectFocusedOption {
+  background-color: #db261f;
+  color: white;
+}
+
+.reg-dropdown .Select-control, .reg-dropdown .Select-input > input {
+  cursor: default;
+  outline: 0;
+  color: black;
+  border-radius: 12px;
+}
+.reg-dropdown.Select--multi .Select-value{
+  color: #1f1b18;
+  font-size: 0.9em;
+  line-height: 1.4;
+  background-color: #fff;
+  border: 1px solid #1F1B18;
+}
+
+.reg-dropdown.Select--multi .Select-value-icon {
+    cursor: pointer;
+    border-bottom-left-radius: 2px;
+    border-top-left-radius: 2px;
+    border-right: 1px solid #1F1B18;
+    padding: 1px 5px 3px;
+}
+.reg-dropdown.Select--multi .Select-value-icon:hover,
+.reg-dropdown.Select--multi .Select-value-icon:focus {
+  /* Fallback color for IE 8 */
+  background-color: #db261f;
+  color: white;
+}
 
 /* Teste de responsividade ---------------------------------------------*/
 @media (min-width: 400px) {
@@ -391,16 +436,15 @@ input[className="location-dropdown"],input[type="email"], input[type="number"], 
   width: 98%;
   height: 455px;
 }
+
 .cardgraph-drs{
   border-style: solid;
   border-width: 2px;
   border-color: #E3E3E3;
-  border-radius: 10px;
-  margin-top : 20px;
-  margin-left:5px;
-  margin-right:5px
+  border-radius: 20px;
+  margin-top : 10px;
   width: 98%;
-  height: 350px;
+  height: 298px;
 }
 
 .spinner {
@@ -413,13 +457,6 @@ input[className="location-dropdown"],input[type="email"], input[type="number"], 
   margin: 100px auto;
   -webkit-animation: sk-rotateplane 1.7s infinite ease-in-out;
   animation: sk-rotateplane 1.7s infinite ease-in-out;
-}
-.img{
-  margin-top : 15px;
-  width: 98%;
-  height: 300px;
-  margin-left: 20px;
-  margin-right:20px;
 }
 
 @-webkit-keyframes sk-rotateplane {
