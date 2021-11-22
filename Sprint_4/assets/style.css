@@ -1,0 +1,479 @@
+@import url('https://fonts.googleapis.com/css?family=Open+Sans&display=swap');
+
+/* Corpo da página ---------------------------------------------*/
+body {
+  background-color: #f1f1f1;
+  color: #f1f1f1;
+  margin: 0;
+  padding: 0;
+  font-color: white;
+}
+
+/* Modals ---------------------------------------------*/
+.faqtitulo{
+  color: #1f1b18;
+  font-color: white;
+  font-size:14px;
+  font-weight: bold;
+  font-family: Gill Sans, sans-serif;
+}
+.faqtitulo:hover {
+  color:#db261f;
+  text-decoration: none;
+}
+
+.cardmodal{
+  background-color: #f1f1f1
+}
+
+/* Fonte dos Cards ---------------------------------------------*/
+H1{
+  font-weight: bold;
+  font-family: Gill Sans, sans-serif;
+  margin-top: -10px;
+}
+
+H2{
+  font-weight: bold;
+  font-family: Gill Sans, sans-serif;
+  margin-top: -10px;
+  margin-bottom: -5px;
+}
+
+H4{
+  color: #3B332D;
+  font-size:13px;
+  font-weight: bold;
+  font-family: Gill Sans, sans-serif;
+  white-space: normal;
+}
+
+H5{
+  font-weight: bold;
+  font-family: Gill Sans, sans-serif;
+}
+
+H6{
+  font-family: Gill Sans, sans-serif;
+}
+
+p{
+  font-family: Gill Sans, sans-serif;
+  font-weight: bold;
+  color: #1f1b18;
+  font-size:27px;
+  margin-left: -8px
+}
+
+/* Cards ---------------------------------------------*/
+.cardsdep{
+  background: linear-gradient(#1F1B18, #2B2621);
+  border-radius: 20px;
+  margin-top : 10px;
+  width: 100%;
+  /* box-shadow: 0.1em 0.1em 0.5em #141210;*/
+}
+
+.cards{
+  border-style: none;
+  border-radius: 20px;
+  margin-top : 10px;
+  box-shadow: 0.1em 0.1em 0.5em #141210;
+}
+
+.cardsteste{
+  border-style: none;
+  border-radius: 20px;
+  margin-top : 10px;
+  box-shadow: 0.1em 0.1em 0.5em #141210;
+  background: linear-gradient(#CC221D, #FC2B23)
+}
+
+.cardsteste2{
+  border-style: none;
+  border-radius: 20px;
+  margin-top : 10px;
+  box-shadow: 0.1em 0.1em 0.5em #141210;
+  background: linear-gradient(#1F1B18, #2B2621)
+}
+
+.card-tabela{
+  border-style: none;
+  margin-top : 15px;
+  box-shadow: none;
+  border-style: solid;
+  border-width: 2px;
+  border-color: #E3E3E3;
+  margin-left : 15px;
+  border-radius: 20px;
+  width: 98%
+}
+
+/* Blockquotes –––––––––––––––––––––––––––––––––––––––––––––––––– */
+blockquote {
+  background-color:var(--background_content)!important;
+  border-left-color:#db261f !important;
+  border-left: 5px lightgrey solid;
+  padding-left: 1rem;
+  margin-top: 15px;
+  margin-bottom: 10px;
+  margin-left: 7px;
+  border-radius: 3px;
+}
+
+/* Buttons –––––––––––––––––––––––––––––––––––––––––––––––––– */
+.button, button, input[type="submit"], input[type="reset"], input[type="button"]{
+  text-align: center;
+  padding: 0px 7.5px;
+  background-color: white;
+  border-radius: 100%;
+  border-style: none;
+  cursor: pointer;
+}
+
+.bt_detalhes{
+  color: white;
+  font-size:12px;
+  border: none;
+  margin-bottom: -10px
+}
+
+.bt_detalhes:hover{
+  color:gray;
+  text-decoration: none;
+}
+
+.bt_close_modal{
+  background-color: #db261f;
+  color: white;
+  font-size:12px;
+  border: none;
+}
+
+.buttonred{
+  text-align: center;
+  padding: 0px 7.5px;
+  background-color: #db261f;
+  border-radius: 100%;
+  border-style: none;
+  cursor: pointer;
+}
+
+.bt-sobre{
+  backgroung-color: #db261f;
+  color: white;
+  font-size:12px;
+  border: none;
+  float: right
+}
+
+.bt-sobre:hover {
+  color:#db261f;
+  text-decoration: none;
+}
+
+.bt-link{
+  color:#db261f;
+  font-size:12px;
+  border: none;
+}
+
+.btn-link:focus,
+.btn-link.focus {
+  text-decoration:none
+ }
+
+/* Forms –––––––––––––––––––––––––––––––––––––––––––––––––– */
+input[className="location-dropdown"],input[type="email"], input[type="number"], input[type="search"], input[type="text"], input[type="tel"], input[type="url"], input[type="password"], textarea, select {
+  height: 36.5px;
+  padding: 6px 10px;
+  background-color: #1f1b18;
+  border: 1px solid #D1D1D1;
+  box-shadow: none;
+  box-sizing: border-box;
+  font-family: inherit;
+  font-size: inherit;
+  color: #f1f1f1;
+  border-radius: 12px;
+}
+
+/* Dropdown Cidades ---------------------------------------------*/
+.location-dropdown .Select-control, .location-dropdown .Select-menu-outer, .location-dropdown .Select-multi-value-wrapper, .location-dropdown .select-up, .location-dropdown .is-open .location-dropdown .Select-control {
+  background-color: #1f1b18;
+  color: #f1f1f1;
+}
+
+.location-dropdown.Select.has-value.Select--single >.Select-control .Select-value .Select-value-label,
+.location-dropdown.Select.has-value.is-pseudo-focused.Select--single > .Select-control .Select-value .Select-value-label{
+  color: white;
+  height: 36.5px;
+  width: 50px;
+}
+
+.location-dropdown .Select-control{
+  border: 1.5px solid #f1f1f1;
+  height: 35px;
+}
+
+.location-dropdown .VirtualizedSelectFocusedOption {
+  background-color: #db261f;
+}
+
+.location-dropdown .Select-control, .location-dropdown .Select-input > input {
+  width: 100%;
+  cursor: default;
+  outline: 0;
+  color: white;
+  border-radius: 12px;
+}
+/* Dropdown Cidades Tabela ---------------------------------------------*/
+.demo-dropdown .Select-control, .demo-dropdown .Select-menu-outer, .demo-dropdown .Select-multi-value-wrapper, .demo-dropdown .select-up, .demo-dropdown .is-open .demo-dropdown .Select-control {
+  color: #1f1b18;
+}
+
+.demo-dropdown .Select-control{
+  border: none;
+  height: 35px;
+}
+
+.demo-dropdown .VirtualizedSelectFocusedOption {
+  background-color: #db261f;
+  color: white;
+}
+
+.demo-dropdown .Select-control, .demo-dropdown .Select-input > input {
+  width: 100%;
+  cursor: default;
+  outline: 0;
+  color: black;
+  border-radius: none;
+}
+.demo-dropdown.Select--multi .Select-value{
+  color: #1f1b18;
+  font-size: 0.9em;
+  line-height: 1.4;
+  background-color: #fff;
+  border: 1px solid #1f1b18;
+}
+
+.demo-dropdown.Select--multi .Select-value-icon {
+    cursor: pointer;
+    border-bottom-left-radius: 2px;
+    border-top-left-radius: 2px;
+    border-right: 1px solid #1f1b18;
+    padding: 1px 5px 3px;
+}
+.demo-dropdown.Select--multi .Select-value-icon:hover,
+.demo-dropdown.Select--multi .Select-value-icon:focus {
+  /* Fallback color for IE 8 */
+  background-color: #db261f;
+  color: white;
+}
+
+/* Dropdown Cidades Tabela ---------------------------------------------*/
+.reg-dropdown .Select-control, .reg-dropdown .Select-menu-outer, .reg-dropdown .Select-multi-value-wrapper, .reg-dropdown .select-up, .reg-dropdown .is-open .reg-dropdown .Select-control {
+  color: #1f1b18;
+}
+
+.reg-dropdown .Select-control{
+  height: 35px;
+  width: 100%;
+  border: 2px solid #1F1B18;
+  margin-top: 10px;
+}
+
+.reg-dropdown .VirtualizedSelectFocusedOption {
+  background-color: #db261f;
+  color: white;
+}
+
+.reg-dropdown .Select-control, .reg-dropdown .Select-input > input {
+  cursor: default;
+  outline: 0;
+  color: black;
+  border-radius: 12px;
+}
+.reg-dropdown.Select--multi .Select-value{
+  color: #1f1b18;
+  font-size: 0.9em;
+  line-height: 1.4;
+  background-color: #fff;
+  border: 1px solid #1F1B18;
+}
+
+.reg-dropdown.Select--multi .Select-value-icon {
+    cursor: pointer;
+    border-bottom-left-radius: 2px;
+    border-top-left-radius: 2px;
+    border-right: 1px solid #1F1B18;
+    padding: 1px 5px 3px;
+}
+.reg-dropdown.Select--multi .Select-value-icon:hover,
+.reg-dropdown.Select--multi .Select-value-icon:focus {
+  /* Fallback color for IE 8 */
+  background-color: #db261f;
+  color: white;
+}
+
+/* Teste de responsividade ---------------------------------------------*/
+@media (min-width: 400px) {
+}
+/* Larger than phablet (also point when grid becomes active) */
+@media (min-width: 550px) {
+}
+/* Larger than tablet */
+@media (min-width: 750px) {
+}
+/* Larger than desktop */
+@media (min-width: 1000px) {
+}
+/* Larger than Desktop HD */
+@media (min-width: 1200px) {
+}
+
+/* Date Range ---------------------------------------------*/
+#date-range {
+  background-color: #1f1b18;
+  font-family: Gill Sans, sans-serif;
+  font-weight: 200;
+  color: #f1f1f1;
+  border: 1.5px solid #f1f1f1;
+  border-radius: 25px;
+}
+
+._dash-undo-redo {
+  display: none;
+}
+
+.DateRangeInput.DateRangeInput_1{
+  width: 110%
+}
+
+.DateRangePickerInput__withBorder{
+  border:none;
+}
+
+.DateInput.DateInput_1 {
+  background-color: #1f1b18;
+}
+
+.DateRangePickerInput__withBorder {
+  border-radius: 3px;
+  color: #f1f1f1;
+  background: #1f1b18;
+  background-color: #1f1b18;
+}
+
+.DateRangePickerInput_arrow_svg{
+  width: 20px;
+  height: 16px;
+  fill: white;
+}
+
+.DateInput_fangStroke{
+  fill: #161616;
+  stroke: #161616;
+}
+
+.CalendarDay__selected_span{
+  background-color: #08f4f4
+}
+
+.CalendarMonth_caption{
+  color:#000;
+  font-family: Gill Sans, sans-serif;
+}
+
+.DayPickerNavigation_svg__horizontal{
+  fill:#000;
+}
+
+.DateRangePickerInput.DateRangePickerInput_1.DateRangePickerInput__withBorder.DateRangePickerInput__withBorder_2 {
+  border: 0.0px solid #f1f1f1;
+  display: block;
+}
+
+.DateRangePicker_1 {
+  border: 0.0px solid #f1f1f1;
+  display: block;
+}
+
+.DateRangePicker_picker, .DateRangePicker_picker_1, .DateRangePicker_picker__directionLeft,
+.DateRangePicker_picker__directionLeft_2{
+  filter:invert(98%) contrast(90%) opacity(98%);
+}
+
+/* Graph ---------------------------------------------*/
+.graph1{
+  margin-top : 10px;
+  width: 98%;
+  height: 420px;
+  margin-left: 15px;
+}
+.graph2{
+  margin-top : 10px;
+  width: 98%;
+  height: 420px
+}
+
+.cardgraph{
+  border-style: solid;
+  border-width: 2px;
+  border-color: #E3E3E3;
+  border-radius: 20px;
+  margin-top : 10px;
+  width: 98%;
+  height: 455px;
+  margin-left: 15px;
+}
+
+.cardgraph2{
+  border-style: solid;
+  border-width: 2px;
+  border-color: #E3E3E3;
+  border-radius: 20px;
+  margin-top : 10px;
+  width: 98%;
+  height: 455px;
+}
+
+.cardgraph-drs{
+  border-style: solid;
+  border-width: 2px;
+  border-color: #E3E3E3;
+  border-radius: 20px;
+  margin-top : 10px;
+  width: 98%;
+  height: 298px;
+}
+
+.spinner {
+  width: 40px;
+  height: 40px;
+  background-color: #db261f;
+  color: #db261f;
+
+
+  margin: 100px auto;
+  -webkit-animation: sk-rotateplane 1.7s infinite ease-in-out;
+  animation: sk-rotateplane 1.7s infinite ease-in-out;
+}
+
+@-webkit-keyframes sk-rotateplane {
+  0% { -webkit-transform: perspective(120px) }
+  50% { -webkit-transform: perspective(120px) rotateY(180deg) }
+  100% { -webkit-transform: perspective(120px) rotateY(180deg)  rotateX(180deg) }
+}
+
+@keyframes sk-rotateplane {
+  0% {
+    transform: perspective(120px) rotateX(0deg) rotateY(0deg);
+    -webkit-transform: perspective(120px) rotateX(0deg) rotateY(0deg)
+  } 50% {
+    transform: perspective(120px) rotateX(-180.1deg) rotateY(0deg);
+    -webkit-transform: perspective(120px) rotateX(-180.1deg) rotateY(0deg)
+  } 100% {
+    transform: perspective(120px) rotateX(-180deg) rotateY(-179.9deg);
+    -webkit-transform: perspective(120px) rotateX(-180deg) rotateY(-179.9deg);
+  }
+}
