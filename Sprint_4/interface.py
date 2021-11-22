@@ -733,18 +733,15 @@ app.layout = dbc.Container([
     , dbc.Row([
         dbc.Col([
             dcc.Markdown(['''>
-  > Outros Dados
-  >'''], className="lb_imunizados", style={'margin-top': '40px', 'margin-left': '10px'})
+        > Outros Dados
+        >'''], className="lb_imunizados", style={'margin-top': '40px', 'margin-left': '10px'})
         ])
     ])
     ,dbc.Row([
         dbc.Col([
              html.Div(
                 [
-                    dbc.Button("D - Regionais de Saúde", id="open-xl", n_clicks=0, style={'margin-top': '20px', 'margin-left':'25px'}, className='bt_departamentos'),
-                    dbc.Button("Transparencia ", id="open-xl1", n_clicks=0, style={'margin-top': '20px', 'margin-left':'25px'},className='bt_departamentos'),
-
-
+                    dbc.Button("Dep. Regionais de Saúde", id="open-xl", n_clicks=0, style={'margin-top': '20px', 'margin-left':'25px'}, className='bt_departamentos'),
                     dbc.Modal(
                         [
                             dbc.ModalHeader("Departamentos Regionais de Saúde",
@@ -883,8 +880,11 @@ app.layout = dbc.Container([
             ),
         ])
     ])
-
-
+    ,dbc.Row([
+        dcc.Link(children=html.Img(id="im-telegram", src="assets/imagemtelegram.png", width='100%',
+                                   style={'display': 'block', 'margin-top': '40px', 'margin-left': '30px',
+                                          'padding-right': '60px'}), href='https://t.me/Fluffyapi_bot',refresh=True)
+    ])
     ,dbc.Row([
         dbc.Col([
             html.Div([
@@ -1323,15 +1323,6 @@ def display_status(location):
     Output("modal-xl", "is_open"),
     [Input("open-xl", "n_clicks")],
     [State("modal-xl", "is_open")],
-)
-def toggle_modal(n1, is_open):
-    if n1:
-        return not is_open
-    return is_open
-@app.callback(
-    Output("modal-xl1", "is_open"),
-    [Input("open-xl1", "n_clicks")],
-    [State("modal-xl1", "is_open")],
 )
 def toggle_modal(n1, is_open):
     if n1:
