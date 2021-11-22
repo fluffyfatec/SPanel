@@ -22,39 +22,6 @@ df_estadotratado['obitos_novos'] = df_estadotratado.groupby('datahora')["obitos_
 df_estadotratado['pop'] = df_estadotratado.groupby('datahora')["pop"].transform(sum)
 df_estadotratado=df_estadotratado.drop_duplicates(subset='datahora', keep='first')
 
-
-# Tratando df_regiao
-df_regiao_tratado = pd.read_csv("docs/df_regiao.csv", sep=';')
-df_regiao_tratado = df_regiao_tratado.drop(
-    columns= [ 'pacientes_uti_mm7d','total_covid_uti_mm7d','internacoes_7d_l','internacoes_7v7', 'pacientes_uti_ultimo_dia',
-        'pacientes_enf_mm7d','total_covid_enf_mm7d','pacientes_enf_ultimo_dia','total_covid_enf_ultimo_dia', 'leitos_pc'])
-
-# Tratando df_gastos
-
-df_gastos = pd.read_csv('docs/COVID.csv', sep=";",dtype='unicode')
-df_gastos = df_gastos.drop(columns=['Nome Programa','Código Programa','Data da Movimentação','Código Ação','Nome Açao','Número do Processo','Modalidade de Contratação'
-                                    ,'Contratada / Conveniada','CPF / CNPJ / CGC','Descrição Processo','Finalidade/Item','Data de Celebração',
-                                    'Prazo Contratual','Período Prazo Contratual','Status Licitação','Quantidade','Valor Unitário',
-                                    'Nota de Empenho','Tipo de Pagamento','Número de Pagamento',
-                                    'Fonte','Código Nome Fonte Detalhada','Link Evento Licitação/Contrato','Link Licitação','Link Processo','Data de Atualização','Ano Referencia'])
-
-df_gastos['Empenho'] = df_gastos['Empenho'].apply(lambda x: float(x.replace(".","").replace(",",".")))
-df_gastos['Valor NP'] = df_gastos['Valor NP'].apply(lambda x: float(x.replace(".","").replace(",",".")))
-df_gastos['Valor OB'] = df_gastos['Valor OB'].str.replace('.','',regex=True)
-df_gastos['Valor OB'] = df_gastos['Valor OB'].str.replace(',','.').astype(float)
-df_gastos['Total Pago'] = df_gastos.apply(lambda x: x['Valor NP']+ x['Valor OB'], axis=1)
-
-df_gastos = df_gastos.drop(columns=['Valor NE','Valor NL','Valor NP','Valor OB'])
-
-df_gastos['Total Pago'] = df_gastos.groupby('Nome Município')["Total Pago"].transform(sum)
-df_gastos['Empenho'] = df_gastos.groupby('Nome Município')["Empenho"].transform(sum)
-
-df_gastos=df_gastos.drop_duplicates(subset='Nome Município', keep='first')
-
-decimals = 2
-df_gastos['Total Pago'] = df_gastos['Total Pago'].apply(lambda x: round(x, decimals))
-df_gastos['Empenho'] = df_gastos['Empenho'].apply(lambda x: round(x, decimals))
-
 # Tratando vacinas.csv
 df=pd.read_csv("docs/vacinas.csv", sep=';')
 df = df.rename(
@@ -100,5 +67,11 @@ df_state.sort_values("datahora")
 df_state.to_csv("docs/df_tratado.csv")
 df_vacinastratado.to_csv("docs/df_vacinastratado.csv")
 df_estadotratado.to_csv("docs/df_estadotratado.csv")
-df_regiao_tratado.to_csv("docs/df_regiao_tratado.csv")
-df_gastos.to_csv("docs/df_gastos.csv")
+
+# Tratando df_regiao
+
+df_regiao_tratado = pd.read_csv("docs/df_regiao.csv", sep=';')
+df_regiao_tratado = df_regiao_tratado.drop(
+    columns= [ 'pacientes_uti_mm7d','total_covid_uti_mm7d','internacoes_7d_l','internacoes_7v7', 'pacientes_uti_ultimo_dia',
+        'pacientes_enf_mm7d','total_covid_enf_mm7d','pacientes_enf_ultimo_dia','total_covid_enf_ultimo_dia', 'leitos_pc'])
+df_regiao_tratado.to_csv('docs/df_regiao_tratado.csv')
