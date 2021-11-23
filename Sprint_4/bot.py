@@ -97,7 +97,7 @@ def opcao1(mensagem):
 
 @bot.message_handler(commands=["sobre"])
 def opcao2(mensagem):
-    bot.send_message(mensagem.chat.id, f" SPanel é um projeto de estudantes da FATEC SJC que visa informar dados atualizados sobre a Covid19 no estado de São Paulo. Para mais informações entrar em contato via E-mail.\n ------------------------------------------------------------------ \n E-mail (fluffyfatec@gmail.com)\nGitHub (https://github.com/fluffyfatec)\n\nPara ver dados da Covid19: /dados\nPara ver dados sobre a população: /pop \nPara ver dados do Departamento Regional de Saúde /drs\n ------------------------------------------------------------------ \n")
+    bot.send_message(mensagem.chat.id, f" SPanel é um projeto de estudantes da FATEC SJC que visa informar dados atualizados sobre a Covid19 no estado de São Paulo. Para mais informações entrar em contato via E-mail.\n ------------------------------------------------------------------ \nE-mail (fluffyfatec@gmail.com)\nGitHub (https://github.com/fluffyfatec)\n\nPara ver dados da Covid19: /dados\nPara ver dados sobre a população: /pop \nPara ver dados do Departamento Regional de Saúde /drs\n ------------------------------------------------------------------ \n")
 
 
 
