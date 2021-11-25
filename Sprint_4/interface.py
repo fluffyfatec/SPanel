@@ -183,12 +183,11 @@ fig7.update_layout(
     margin = dict(l=40, r=50, t=40, b=40),
 )
 
-# grafico setor 1 regiões
+#grafico regiões
 fig8 = make_subplots(rows=1, cols=2, specs=[[{'type':'domain'}, {'type':'domain'}]],subplot_titles=['Leitos Ocupados(%)', 'Leitos Ocupados - Ultimos 7 Dias(%)'])
 fig8.update_layout(
     margin = dict(l=40, r=50, t=20, b=250),
 )
-# gráfico setor 2 regiões
 fig9 = go.Figure()
 fig9.update_layout(
     title_text='<b>Leitos Ocupados(%)',
@@ -197,9 +196,6 @@ fig9.update_layout(
     autosize=True,
 margin = dict(l=40, r=50, t=30, b=250),
 )
-# gráfico barra regiões
-fig10 = go.Figure()
-
 
 # ==================================================================
 # Layout
@@ -775,8 +771,10 @@ app.layout = dbc.Container([
                                             ],md=2)
                                         ]),
                                             dbc.Popover(
-                                                dbc.PopoverBody([html.H6("Cidades do DRS",style={"font-weight": "bold"}),
-                                                    html.H6("----------------------------------------------------")
+                                                dbc.PopoverBody([html.H4("Cidades do DRS",style={"font-weight": "bold"}),
+                                                                 html.H6('teste',style={"color": "black","align": "right"},
+                                                                         id="drs-popover",
+                                                                         )
                                                  ]),
                                                 id="focus",
                                                 target="focus-target",
@@ -855,13 +853,6 @@ app.layout = dbc.Container([
                                             dbc.Card([
                                                 dbc.CardBody([
                                                     dcc.Graph(id="cardgraph-drs", className='graph1')
-                                                ])
-                                            ], className="cardgraph-drs")
-                                        ]),
-                                        dbc.Row([
-                                            dbc.Card([
-                                                dbc.CardBody([
-                                                    dcc.Graph(id="cardgraph-drs2", className='graph1')
                                                 ])
                                             ], className="cardgraph-drs")
                                         ])
@@ -1207,6 +1198,25 @@ def display_ocupacao(location):
      return (
          fig8
      )
+#=================
+#drs pop
+@app.callback(
+    Output("drs-popover", "children"),
+    Input("demo-reg","value")
+)
+def display_status(location):
+    df_regiao_tratado=pd.read_csv('docs/df_regiao_tratado.csv')
+    if not location:
+        pass
+    else:
+        df_data_regiao=df_regiao_tratado[df_regiao_tratado["nome_drs"]==location]
+
+
+    cidade = df_data_regiao["Cidades"].values[0]
+
+
+
+    return cidade
 
 # ==================================================================
 # Grafico Modal Regioes 2
@@ -1239,23 +1249,6 @@ def display_ocupacao(location):
      return (
          fig8
      )
-#Gráfico Região 3
-@app.callback(
-     Output("cardgraph-drs2", "figure"),
-     Input("demo-reg", "value")
-)
-def display_ocupacao(location):
-     if not location:
-         df_data_regiao = df_regiao_tratado[df_regiao_tratado['nome_drs'] == 'Estado de São Paulo']
-     else:
-         df_data_regiao = df_regiao_tratado[df_regiao_tratado['nome_drs'] == location]
-
-     fig10.add_trace(go.Bar(x=df_regiao_tratado["datahora"], y=df_regiao_tratado["total_covid_uti_ultimo_dia"]))
-     fig10.update_traces(go.Bar(x=df_data_regiao["datahora"], y=df_data_regiao['total_covid_uti_ultimo_dia']))
-     return (
-         fig10
-     )
-
 
 # Chamada do modal SOBRE
 @app.callback(
