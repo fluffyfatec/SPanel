@@ -183,19 +183,26 @@ fig7.update_layout(
     margin = dict(l=40, r=50, t=40, b=40),
 )
 
-#grafico regiões
+# grafico setor 1 regiões
 fig8 = make_subplots(rows=1, cols=2, specs=[[{'type':'domain'}, {'type':'domain'}]],subplot_titles=['Leitos Ocupados(%)', 'Leitos Ocupados - Ultimos 7 Dias(%)'])
 fig8.update_layout(
-    margin = dict(l=40, r=50, t=20, b=250),
+    margin = dict(l=20, r=50, t=20, b=10),
 )
-fig9 = go.Figure()
-fig9.update_layout(
-    title_text='<b>Leitos Ocupados(%)',
+
+# gráfico barra regiões
+fig10 = go.Figure()
+fig10.add_trace(go.Bar(x=df_regiao_tratado["datahora"], y=df_regiao_tratado["internacoes_ultimo_dia"],text=df_regiao_tratado["internacoes_ultimo_dia"],marker_color='#db261f'),)
+fig10.update_layout(
+    yaxis=dict(ticks="outside", gridcolor='#f1f1f1',showline=True,showticklabels=True,linewidth=2,linecolor='rgb(204, 204, 204)'),
+    xaxis=dict(showline=True,showticklabels=True,linewidth=2,linecolor='rgb(204, 204, 204)'),
+    title='Internações Confirmadas',
     font=dict(family='Gill Sans, sans-serif',size=12,color='#1f1b18'),
+    yaxis_title='Nº Internados',
+    plot_bgcolor='white',
     title_x = 0.5,
     autosize=True,
-margin = dict(l=40, r=50, t=30, b=250),
-)
+    margin = dict(l=5, r=0, t=25, b=5),
+    showlegend=False)
 
 # ==================================================================
 # Layout
@@ -745,7 +752,6 @@ app.layout = dbc.Container([
                     dbc.Modal(
                         [
                             dbc.ModalHeader("Departamentos Regionais de Saúde",
-
                                             style={"color": "#1f1b18", "font-weight": "bold",
                                                    "background-color": "#f1f1f1"})
                             ,dbc.ModalBody(
@@ -761,24 +767,24 @@ app.layout = dbc.Container([
                                                     clearable=False),
                                                 ],md=10),
                                             dbc.Col([
-                                                dbc.Button(
-                                                    "i",
-                                                    id="focus-target",
-                                                    color="link",
-                                                    className="button",
-                                                    n_clicks=0
-                                                )
+                                                dbc.Button(children=[
+                                                    html.Img(src="assets/information-button3.png", width=7,
+                                                             style={'justify-content': 'center'})],
+                                                           id="focus-target",
+                                                           className="buttondrs",
+                                                           n_clicks=0)
                                             ],md=2)
                                         ]),
                                             dbc.Popover(
-                                                dbc.PopoverBody([html.H4("Cidades do DRS",style={"font-weight": "bold"}),
-                                                                 html.H6('teste',style={"color": "black","align": "right"},
-                                                                         id="drs-popover",
-                                                                         )
+                                                dbc.PopoverBody(
+                                                    [html.H5("Cidades da Região", style={"font-weight": "bold"}),
+                                                     html.H4('', style={"color": "black", "align": "right"},
+                                                             id="drs-popover",
+                                                             )
                                                  ]),
                                                 id="focus",
                                                 target="focus-target",
-                                                trigger="focus",
+                                                trigger="hover",
                                             ),
                                             dbc.Card([
                                                 dbc.CardBody([
@@ -845,14 +851,14 @@ app.layout = dbc.Container([
                                         dbc.Row([
                                             dbc.Card([
                                                 dbc.CardBody([
-                                                    dcc.Graph(id="cardgraph-drs1", className='graph1')
+                                                    dcc.Graph(id="cardgraph-drs1", className='graphdrs')
                                                 ])
                                             ], className="cardgraph-drs")
                                         ]),
                                         dbc.Row([
                                             dbc.Card([
                                                 dbc.CardBody([
-                                                    dcc.Graph(id="cardgraph-drs", className='graph1')
+                                                    dcc.Graph(id="cardgraph-drs", className='graphdrs')
                                                 ])
                                             ], className="cardgraph-drs")
                                         ])
@@ -1170,57 +1176,6 @@ def display_letal(location,start_date,end_date):
 # ==================================================================
 # Grafico Modal Regioes 1
 @app.callback(
-     Output("cardgraph-drs", "figure"),
-     Input("demo-reg", "value")
-)
-
-def display_ocupacao(location):
-     if not location:
-         df_data_regiao = df_regiao_tratado[df_regiao_tratado['nome_drs'] == 'Estado de São Paulo']
-         end_date = df_data_regiao["datahora"].max()
-         df_data_regiao = df_data_regiao[df_data_regiao['datahora'] == end_date]
-         ocup_leito = df_data_regiao['ocupacao_leitos'].values[0].replace(',','.')
-         ocup_leito = float(ocup_leito)
-         desocup_leito = 100 - ocup_leito
-         labels = ['Leitos Ocupados', 'Leitos Desocupados']
-         values = [(ocup_leito), (desocup_leito)]
-     else:
-         df_data_regiao = df_regiao_tratado[df_regiao_tratado['nome_drs'] == location]
-         end_date = df_data_regiao["datahora"].max()
-         df_data_regiao = df_data_regiao[df_data_regiao['datahora'] == end_date]
-         ocup_leito = df_data_regiao['ocupacao_leitos'].values[0].replace(',','.')
-         ocup_leito = float(ocup_leito)
-         desocup_leito = 100 - ocup_leito
-         labels = ['Leitos Ocupados', 'Leitos Desocupados']
-         values = [(ocup_leito), (desocup_leito)]
-     fig8.add_trace(go.Pie(values=values, labels=labels,pull=[0, 0.05],hole=.3,marker=dict(colors=colors2),name="Ultimos 7 Dias"),1,2)
-     fig8.update_traces(go.Pie(values=values, labels=labels),1,2)
-     return (
-         fig8
-     )
-#=================
-#drs pop
-@app.callback(
-    Output("drs-popover", "children"),
-    Input("demo-reg","value")
-)
-def display_status(location):
-    df_regiao_tratado=pd.read_csv('docs/df_regiao_tratado.csv')
-    if not location:
-        pass
-    else:
-        df_data_regiao=df_regiao_tratado[df_regiao_tratado["nome_drs"]==location]
-
-
-    cidade = df_data_regiao["Cidades"].values[0]
-
-
-
-    return cidade
-
-# ==================================================================
-# Grafico Modal Regioes 2
-@app.callback(
      Output("cardgraph-drs1", "figure"),
      Input("demo-reg", "value")
 )
@@ -1230,25 +1185,56 @@ def display_ocupacao(location):
          df_data_regiao = df_regiao_tratado[df_regiao_tratado['nome_drs'] == 'Estado de São Paulo']
          end_date = df_data_regiao["datahora"].max()
          df_data_regiao = df_data_regiao[df_data_regiao['datahora'] == end_date]
-         ocup_leito_ultimo = df_data_regiao['ocupacao_leitos_ultimo_dia'].values[0].replace(',','.')
+         ocup_leito = df_data_regiao['ocupacao_leitos'].values[0].replace(',','.')
+         ocup_leito = float(ocup_leito)
+         desocup_leito = 100 - ocup_leito
+         labels = ['Leitos Ocupados', 'Leitos Desocupados']
+         values = [(ocup_leito), (desocup_leito)]
+
+         ocup_leito_ultimo = df_data_regiao['ocupacao_leitos_ultimo_dia'].values[0].replace(',', '.')
          ocup_leito_ultimo = float(ocup_leito_ultimo)
          desocup_leito_ultimo = 100 - ocup_leito_ultimo
-         labels = ['Leitos Ocupados', 'Leitos Desocupados']
-         values = [(ocup_leito_ultimo), (desocup_leito_ultimo)]
+         values2 = [(ocup_leito_ultimo), (desocup_leito_ultimo)]
      else:
          df_data_regiao = df_regiao_tratado[df_regiao_tratado['nome_drs'] == location]
          end_date = df_data_regiao["datahora"].max()
          df_data_regiao = df_data_regiao[df_data_regiao['datahora'] == end_date]
-         ocup_leito_ultimo = df_data_regiao['ocupacao_leitos_ultimo_dia'].values[0].replace(',','.')
+         ocup_leito = df_data_regiao['ocupacao_leitos'].values[0].replace(',','.')
+         ocup_leito = float(ocup_leito)
+         desocup_leito = 100 - ocup_leito
+         labels = ['Leitos Ocupados', 'Leitos Desocupados']
+         values = [(ocup_leito), (desocup_leito)]
+
+         ocup_leito_ultimo = df_data_regiao['ocupacao_leitos_ultimo_dia'].values[0].replace(',', '.')
          ocup_leito_ultimo = float(ocup_leito_ultimo)
          desocup_leito_ultimo = 100 - ocup_leito_ultimo
-         labels = ['Leitos Ocupados', 'Leitos Desocupados']
-         values = [(ocup_leito_ultimo), (desocup_leito_ultimo)]
-     fig8.add_trace(go.Pie(values=values, labels=labels,pull=[0, 0.05],hole=.3,marker=dict(colors=colors2),name="Ultimo Dia"),1,1)
-     fig8.update_traces(go.Pie(values=values, labels=labels),1,1)
+         values2 = [(ocup_leito_ultimo), (desocup_leito_ultimo)]
+
+     fig8.add_trace(go.Pie(values=values, labels=labels, hole=.3, marker=dict(colors=colors2),
+                           name="Ultimos 7 Dias"), 1, 2)
+     fig8.add_trace(go.Pie(values=values2, labels=labels, hole=.3, marker=dict(colors=colors2),
+                           name="Ultimo Dia"), 1, 1)
      return (
          fig8
      )
+
+# # ==================================================================
+#Gráfico Região 3
+@app.callback(
+     Output("cardgraph-drs", "figure"),
+     Input("demo-reg", "value")
+)
+def display_ocupacao(location):
+     if not location:
+         pass
+     else:
+         df_data_regiao = df_regiao_tratado[df_regiao_tratado['nome_drs'] == location]
+
+     fig10.update_traces(go.Bar(x=df_data_regiao["datahora"], y=df_data_regiao['internacoes_ultimo_dia'],text=df_data_regiao["internacoes_ultimo_dia"]))
+     return (
+         fig10
+     )
+
 
 # Chamada do modal SOBRE
 @app.callback(
@@ -1303,7 +1289,9 @@ def toggle_accordion(n1, n2, n3, n4, is_open1, is_open2, is_open3, is_open4):
     elif button_id == "group-4-toggle" and n4:
         return False, False, False, not is_open4
     return False, False, False
-#==============================
+
+# ==================================================================
+# Cards DRS
 @app.callback(
     [
         Output("ocupacao_leitos", "children"),
@@ -1337,6 +1325,22 @@ def display_status(location):
            coviduti,
            f'{ocupacao}%',
            ultimodia)
+# ==================================================================
+# Popover DRS
+@app.callback(
+    Output("drs-popover", "children"),
+    Input("demo-reg","value")
+)
+def display_status(location):
+    df_regiao_tratado=pd.read_csv('docs/df_regiao_tratado.csv')
+    if not location:
+        pass
+    else:
+        df_data_regiao=df_regiao_tratado[df_regiao_tratado["nome_drs"]==location]
+
+    cidade = df_data_regiao["Cidades"].values[0]
+
+    return cidade
 
 #================= Callback modal macro=================================================
 
