@@ -159,6 +159,16 @@ blockquote {
   cursor: pointer;
 }
 
+.buttondrs{
+  text-align: center;
+  padding: 0px 7.5px;
+  margin: 15px 0 0 10px;
+  background-color: #db261f;
+  border-radius: 100%;
+  border-style: none;
+  cursor: pointer;
+}
+
 .bt-sobre{
   backgroung-color: #db261f;
   color: white;
@@ -182,6 +192,11 @@ blockquote {
 .btn-link.focus {
   text-decoration:none
  }
+
+.bt_departamentos{
+   background-color: #db261f;
+   border-radius: 10px;
+}
 
 /* Forms –––––––––––––––––––––––––––––––––––––––––––––––––– */
 input[className="location-dropdown"],input[type="email"], input[type="number"], input[type="search"], input[type="text"], input[type="tel"], input[type="url"], input[type="password"], textarea, select {
@@ -277,7 +292,7 @@ input[className="location-dropdown"],input[type="email"], input[type="number"], 
 
 .reg-dropdown .Select-control{
   height: 35px;
-  width: 100%;
+  width: 110%;
   border: 2px solid #1F1B18;
   margin-top: 10px;
 }
@@ -415,6 +430,11 @@ input[className="location-dropdown"],input[type="email"], input[type="number"], 
   width: 98%;
   height: 420px
 }
+.graphdrs{
+  margin-top : 10px;
+  height: 250px;
+  margin-left: 15px;
+}
 
 .cardgraph{
   border-style: solid;
@@ -444,36 +464,9 @@ input[className="location-dropdown"],input[type="email"], input[type="number"], 
   border-radius: 20px;
   margin-top : 10px;
   width: 98%;
-  height: 298px;
+  height: 297px;
 }
 
-.spinner {
-  width: 40px;
-  height: 40px;
-  background-color: #db261f;
-  color: #db261f;
+.im-telegram{
 
-
-  margin: 100px auto;
-  -webkit-animation: sk-rotateplane 1.7s infinite ease-in-out;
-  animation: sk-rotateplane 1.7s infinite ease-in-out;
-}
-
-@-webkit-keyframes sk-rotateplane {
-  0% { -webkit-transform: perspective(120px) }
-  50% { -webkit-transform: perspective(120px) rotateY(180deg) }
-  100% { -webkit-transform: perspective(120px) rotateY(180deg)  rotateX(180deg) }
-}
-
-@keyframes sk-rotateplane {
-  0% {
-    transform: perspective(120px) rotateX(0deg) rotateY(0deg);
-    -webkit-transform: perspective(120px) rotateX(0deg) rotateY(0deg)
-  } 50% {
-    transform: perspective(120px) rotateX(-180.1deg) rotateY(0deg);
-    -webkit-transform: perspective(120px) rotateX(-180.1deg) rotateY(0deg)
-  } 100% {
-    transform: perspective(120px) rotateX(-180deg) rotateY(-179.9deg);
-    -webkit-transform: perspective(120px) rotateX(-180deg) rotateY(-179.9deg);
-  }
 }
