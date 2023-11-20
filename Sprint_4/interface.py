@@ -57,8 +57,15 @@ segundadose = df_tratado_rename["Segunda Dose"].sum()
 terceiradose = df_tratado_rename["Terceira Dose"].sum()
 populacao = df_tratado_rename["População"].sum()
 data = df_tratado_rename['Data da Atualização'].max()
-df_tratado_rename = df_tratado_rename.append(dict(zip(df_tratado_rename.columns, ['ESTADO DE SÃO PAULO', casosacumulados,obitossacumulados,doseunica,primeiradose,segundadose,terceiradose,populacao,data])),ignore_index=True)
-list_tabela=['ESTADO DE SÃO PAULO','SÃO PAULO', 'GUARULHOS', 'CAMPINAS', 'SÃO BERNARDO DO CAMPO', 'SÃO JOSÉ DOS CAMPOS', 'SANTO ANDRÉ']
+new_row = dict(zip(df_tratado_rename.columns, ['ESTADO DE SÃO PAULO', casosacumulados, obitossacumulados, doseunica, primeiradose, segundadose, terceiradose, populacao, data]))
+
+# Use concat to add the new row to the DataFrame
+df_tratado_rename = pd.concat([df_tratado_rename, pd.DataFrame([new_row])], ignore_index=True)
+
+# List of municipalities
+list_tabela = ['ESTADO DE SÃO PAULO', 'SÃO PAULO', 'GUARULHOS', 'CAMPINAS', 'SÃO BERNARDO DO CAMPO', 'SÃO JOSÉ DOS CAMPOS', 'SANTO ANDRÉ']
+
+# List of municipalities from the DataFrame
 list_municipios2 = sorted(df_tratado_rename['Localização'].unique())
 
 # ==================================================================
@@ -1020,20 +1027,24 @@ def display_vacinas(location):
         soma_terceira = df_vacinastratado['terceiradose'].sum()
         soma_segunda = df_vacinastratado['segundadose'].sum()
         soma_primeira = df_vacinastratado['primeiradose'].sum()
-        df_data_vacinas = df_vacinas.append(dict(zip(df_vacinas.columns, ['Estado', 'UNICA', soma_unica])),ignore_index=True)
-        df_data_vacinas = df_data_vacinas.append(dict(zip(df_vacinas.columns, ['Estado', '3º DOSE', soma_terceira])),ignore_index=True)
-        df_data_vacinas = df_data_vacinas.append(dict(zip(df_vacinas.columns, ['Estado', '2º DOSE', soma_segunda])),ignore_index=True)
-        df_data_vacinas = df_data_vacinas.append(dict(zip(df_vacinas.columns, ['Estado', '1º DOSE', soma_primeira])),ignore_index=True)
-        df_data_vacinas = df_data_vacinas.query('nome_munic=="Estado"') #alterar para dados do estado
+
+        # Cria um novo DataFrame com os dados que deseja adicionar
+        novos_dados = pd.DataFrame({
+            'nome_munic': ['Estado'],
+            'Dose': ['UNICA'],
+            'Total Doses Aplicadas': [soma_unica]
+        })
+
+        # Concatena o novo DataFrame ao DataFrame original
+        df_data_vacinas = pd.concat([df_vacinas, novos_dados], ignore_index=True)
+
     else:
         df_data_vacinas = df_vacinas[df_vacinas["nome_munic"] == location]
 
-    # update grafico
     fig0.update_traces(go.Bar(x=df_data_vacinas["Total Doses Aplicadas"], y=df_data_vacinas["Dose"],text=df_data_vacinas["Total Doses Aplicadas"],marker_color='#db261f'))
     return (
         fig0
     )
-
 # ==================================================================
 # Grafico Vacinas Aplicadas
 @app.callback(
